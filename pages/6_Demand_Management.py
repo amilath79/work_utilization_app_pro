@@ -20,7 +20,7 @@ from utils.state_manager import StateManager
 from utils.kpi_manager import load_punch_codes
 from utils.sql_data_connector import load_demand_forecast_data, SQLDataConnector
 from config import (DATA_DIR, SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, 
-                   DATE_FORMAT, CACHE_TTL, SQL_DATABASE_LIVE)
+                   DATE_FORMAT, PUNCH_CODE_NAMES) 
 
 # Configure page
 st.set_page_config(
@@ -480,160 +480,188 @@ def main():
                 else:
                     st.info("ℹ️ No demand shifts were needed - all dates are working days.")
                 
-    # Tabs for different views
-    tab1, tab2 = st.tabs(["Demand Forecast", "Adjustment Factors"])
     
-    with tab1:
-        # Create formatted dataframe for display
-        display_df = create_formatted_dataframe(
-            st.session_state.demand_df,
-            st.session_state.actual_quantities_cells,
-            st.session_state.user_modified_cells,
-            punch_code_values
-        )
+
+    # Create formatted dataframe for display
+    display_df = create_formatted_dataframe(
+        st.session_state.demand_df,
+        st.session_state.actual_quantities_cells,
+        st.session_state.user_modified_cells,
+        punch_code_values
+    )
+    
+    display_df_transformed = display_df.copy()
+    
+    # Create column mapping for display
+    column_mapping = {}
+    for code in punch_code_values:
+        if code in PUNCH_CODE_NAMES:
+            column_mapping[code] = PUNCH_CODE_NAMES[code]
+    
+    # Rename punch code columns to display names
+    display_df_transformed = display_df_transformed.rename(columns=column_mapping)
+    
+    # Create column config with display names
+    punch_code_column_config = {}
+    for code in punch_code_values:
+        if code in PUNCH_CODE_NAMES:
+            display_name = PUNCH_CODE_NAMES[code]
+            punch_code_column_config[display_name] = st.column_config.TextColumn(
+                display_name,
+                width="small",
+                help=f"Forecast for {display_name} (Code: {code})"
+            )
+        else:
+            punch_code_column_config[code] = st.column_config.TextColumn(
+                code,
+                width="small", 
+                help=f"Forecast for Punch Code {code}"
+            )
+    
+    # Make dataframe editable with formatted values and display names
+    st.write("### Editable Forecast with Visual Indicators")
+    edited_df = st.data_editor(
+        display_df_transformed,
+        use_container_width=True,
+        num_rows="fixed",
+        hide_index=True,
+        column_config={
+            "Date": st.column_config.TextColumn(
+                "Date",
+                width="medium",
+                help="Forecast date"
+            ),
+            **punch_code_column_config
+        },
+        key="demand_editor"
+    )
+
+# Update session state with edited values and track changes
+    if not display_df_transformed.equals(edited_df):
+        changes_made = False  # Track if any changes were made
         
-        # Make dataframe editable with formatted values
-        st.write("### Editable Forecast with Visual Indicators")
-        edited_df = st.data_editor(
-            display_df,
-            use_container_width=True,
-            num_rows="fixed",
-            hide_index=True,
-            column_config={
-                "Date": st.column_config.TextColumn(
-                    "Date",
-                    width="medium",
-                    help="Forecast date"
-                ),
-                **{
-                    code: st.column_config.TextColumn(  # Use TextColumn to preserve formatting
-                        code,
-                        width="small",
-                        help=f"Forecast for Punch Code {code}"
+        # Create reverse mapping for processing changes
+        reverse_column_mapping = {v: k for k, v in column_mapping.items()}
+        
+        # Process changes and update the underlying data
+        for idx, row in edited_df.iterrows():
+            for display_col in edited_df.columns:
+                if display_col == "Date":
+                    continue
+                
+                # Map display column back to punch code
+                original_col = reverse_column_mapping.get(display_col, display_col)
+                
+                if display_col in display_df_transformed.columns and display_df_transformed.at[idx, display_col] != row[display_col]:
+                    cell_id = f"{row['Date']}_{original_col}"
+                    
+                    # Extract numeric value and update the base dataframe
+                    new_value = extract_numeric_value(row[display_col])
+                    st.session_state.demand_df.at[idx, original_col] = new_value
+                    
+                    # Mark as user-modified if it's not an actual quantity cell
+                    if cell_id not in st.session_state.actual_quantities_cells:
+                        st.session_state.user_modified_cells.add(cell_id)
+                        changes_made = True
+        
+        # Force a rerun to immediately update the display with new formatting
+        if changes_made:
+            st.rerun()
+
+    # MOVE THE METRICS CALCULATION HERE - AFTER DATA PROCESSING
+    # Calculate totals for color-coded metrics
+    original_total, actual_total, modified_total = calculate_totals(
+        st.session_state.demand_df,  # Use the underlying dataframe, not the formatted one
+        st.session_state.actual_quantities_cells,
+        st.session_state.user_modified_cells,
+        punch_code_values
+    )
+    
+    # Color-coded metric boxes
+    st.write("### Summary")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("🔵 Original Forecast", f"{original_total:,}", help="Total from database forecast")
+    
+    with col2:
+        st.metric("🟢 Actual Quantities", f"{actual_total:,}", help="Total from tomorrow's actual data")
+    
+    with col3:
+        st.metric("🔴 Your Changes", f"{modified_total:,}", help="Total from your modifications")
+    
+    with col4:
+        total_all = original_total + actual_total + modified_total
+        st.metric("📊 Grand Total", f"{total_all:,}", help="Sum of all quantities")
+    
+    # Legend
+    st.markdown("""
+    **Legend:**
+    - **Plain numbers**: Original forecast data loaded from database
+    - **✓ Bold numbers**: Tomorrow's actual quantities
+    - **● Bold numbers**: User-modified values
+    """)
+    
+    # Display information about data types
+    if st.session_state.actual_quantities_cells:
+        st.info(f"✅ {len(st.session_state.actual_quantities_cells)} cells contain actual quantities for tomorrow")
+    
+    if st.session_state.user_modified_cells:
+        st.warning(f"✏️ {len(st.session_state.user_modified_cells)} cells have been modified by you")
+    
+    # Action buttons
+    col1, col2, col3 = st.columns([1, 1, 3])
+    
+    with col1:
+        # Username input
+        username = st.text_input("Your Username", value=get_current_user())
+    
+    with col2:
+        # Save Forecast button
+        if st.button("Save Forecast", type="primary"):
+            if not username:
+                st.error("Please enter your username")
+            else:
+                with st.spinner("Saving forecast data..."):
+                    # Use the original dataframe for saving (with numeric values)
+                    success, message = save_forecast_to_database(
+                        st.session_state.demand_df,  # Use the underlying dataframe instead of display_df
+                        punch_code_values, 
+                        username
                     )
-                    for code in punch_code_values
-                }
-            },
-            key="demand_editor"
-        )
+                    
+                    if success:
+                        st.success(message)
+                    else:
+                        st.error(message)
+        
+    with col3:
+        st.write("")
 
-        # Update session state with edited values and track changes
-        if not display_df.equals(edited_df):
-            changes_made = False  # Track if any changes were made
+    # with tab2:
+    #     st.write("### Adjustment Factors")
+        
+    #     # Create columns for different factors
+    #     adj_col1, adj_col2 = st.columns(2)
+        
+    #     with adj_col1:
+    #         st.write("#### Seasonal Factors")
             
-            # Process changes and update the underlying data
-            for idx, row in edited_df.iterrows():
-                for col in punch_code_values:
-                    if display_df.at[idx, col] != row[col]:
-                        cell_id = f"{row['Date']}_{col}"
-                        
-                        # Extract numeric value and update the base dataframe
-                        new_value = extract_numeric_value(row[col])
-                        st.session_state.demand_df.at[idx, col] = new_value
-                        
-                        # Mark as user-modified if it's not an actual quantity cell
-                        if cell_id not in st.session_state.actual_quantities_cells:
-                            st.session_state.user_modified_cells.add(cell_id)
-                            changes_made = True
+    #         # Seasonal adjustment sliders
+    #         st.slider("Weekend Adjustment", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
+    #         st.slider("Holiday Adjustment", min_value=0.5, max_value=1.5, value=0.8, step=0.1)
+    #         st.slider("Monday Adjustment", min_value=0.5, max_value=1.5, value=1.1, step=0.1)
+    #         st.slider("Friday Adjustment", min_value=0.5, max_value=1.5, value=0.9, step=0.1)
+        
+    #     with adj_col2:
+    #         st.write("#### Operational Factors")
             
-            # Force a rerun to immediately update the display with new formatting
-            if changes_made:
-                st.rerun()
-
-        # MOVE THE METRICS CALCULATION HERE - AFTER DATA PROCESSING
-        # Calculate totals for color-coded metrics
-        original_total, actual_total, modified_total = calculate_totals(
-            st.session_state.demand_df,  # Use the underlying dataframe, not the formatted one
-            st.session_state.actual_quantities_cells,
-            st.session_state.user_modified_cells,
-            punch_code_values
-        )
-        
-        # Color-coded metric boxes
-        st.write("### Summary")
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            st.metric("🔵 Original Forecast", f"{original_total:,}", help="Total from database forecast")
-        
-        with col2:
-            st.metric("🟢 Actual Quantities", f"{actual_total:,}", help="Total from tomorrow's actual data")
-        
-        with col3:
-            st.metric("🔴 Your Changes", f"{modified_total:,}", help="Total from your modifications")
-        
-        with col4:
-            total_all = original_total + actual_total + modified_total
-            st.metric("📊 Grand Total", f"{total_all:,}", help="Sum of all quantities")
-        
-        # Legend
-        st.markdown("""
-        **Legend:**
-        - **Plain numbers**: Original forecast data loaded from database
-        - **✓ Bold numbers**: Tomorrow's actual quantities
-        - **● Bold numbers**: User-modified values
-        """)
-        
-        # Display information about data types
-        if st.session_state.actual_quantities_cells:
-            st.info(f"✅ {len(st.session_state.actual_quantities_cells)} cells contain actual quantities for tomorrow")
-        
-        if st.session_state.user_modified_cells:
-            st.warning(f"✏️ {len(st.session_state.user_modified_cells)} cells have been modified by you")
-        
-        # Action buttons
-        col1, col2, col3 = st.columns([1, 1, 3])
-        
-        with col1:
-            # Username input
-            username = st.text_input("Your Username", value=get_current_user())
-        
-        with col2:
-            # Save Forecast button
-            if st.button("Save Forecast", type="primary"):
-                if not username:
-                    st.error("Please enter your username")
-                else:
-                    with st.spinner("Saving forecast data..."):
-                        # Use the original dataframe for saving (with numeric values)
-                        success, message = save_forecast_to_database(
-                            st.session_state.demand_df,  # Use the underlying dataframe instead of display_df
-                            punch_code_values, 
-                            username
-                        )
-                        
-                        if success:
-                            st.success(message)
-                        else:
-                            st.error(message)
-            
-        with col3:
-            st.write("")
-
-    with tab2:
-        st.write("### Adjustment Factors")
-        
-        # Create columns for different factors
-        adj_col1, adj_col2 = st.columns(2)
-        
-        with adj_col1:
-            st.write("#### Seasonal Factors")
-            
-            # Seasonal adjustment sliders
-            st.slider("Weekend Adjustment", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
-            st.slider("Holiday Adjustment", min_value=0.5, max_value=1.5, value=0.8, step=0.1)
-            st.slider("Monday Adjustment", min_value=0.5, max_value=1.5, value=1.1, step=0.1)
-            st.slider("Friday Adjustment", min_value=0.5, max_value=1.5, value=0.9, step=0.1)
-        
-        with adj_col2:
-            st.write("#### Operational Factors")
-            
-            # Operational adjustment sliders
-            st.slider("Backlog Factor", min_value=0.0, max_value=1.0, value=0.2, step=0.05, 
-                     help="Percentage of previous day's work that remains as backlog")
-            st.slider("Productivity Factor", min_value=0.8, max_value=1.2, value=1.0, step=0.05)
-            st.slider("Absence Factor", min_value=0.0, max_value=0.2, value=0.05, step=0.01, 
-                     help="Expected absence rate")
+    #         # Operational adjustment sliders
+    #         st.slider("Backlog Factor", min_value=0.0, max_value=1.0, value=0.2, step=0.05, 
+    #                  help="Percentage of previous day's work that remains as backlog")
+    #         st.slider("Productivity Factor", min_value=0.8, max_value=1.2, value=1.0, step=0.05)
+    #         st.slider("Absence Factor", min_value=0.0, max_value=0.2, value=0.05, step=0.01, 
+    #                  help="Expected absence rate")
     
 if __name__ == "__main__":
     main()

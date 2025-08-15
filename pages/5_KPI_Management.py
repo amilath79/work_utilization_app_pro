@@ -14,6 +14,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.state_manager import StateManager
 from utils.kpi_manager import load_kpi_data, save_kpi_data, initialize_kpi_dataframe, save_financial_year
+from utils.display_utils import transform_punch_code_columns, get_streamlit_column_config  
+from config import PUNCH_CODE_NAMES
 
 # Configure page
 st.set_page_config(
@@ -138,16 +140,39 @@ def main():
     # Store the original data in session state for later reference
     st.session_state.original_kpi_df = kpi_df.copy()
     
-    # Use the data editor - now without saving the return value
+    # Transform dataframe to use display names for column headers
+    kpi_df_display = transform_punch_code_columns(kpi_df)
+    
+    # Create column config with display names
+    kpi_column_config = {
+        "Date": st.column_config.TextColumn("Date", disabled=True)
+    }
+    
+    # Add punch code columns with display names
+    for col in kpi_df.columns:
+        if col != "Date" and col in PUNCH_CODE_NAMES:
+            display_name = PUNCH_CODE_NAMES[col]
+            kpi_column_config[display_name] = st.column_config.NumberColumn(
+                display_name,
+                format="%.2f",
+                help=f"KPI values for {display_name} (Code: {col})"
+            )
+        elif col != "Date":
+            # For any punch codes not in the mapping, use original name
+            kpi_column_config[col] = st.column_config.NumberColumn(
+                col,
+                format="%.2f",
+                help=f"KPI values for Punch Code {col}"
+            )
+    
+    # Use the data editor with display names
     st.data_editor(
-        kpi_df,
+        kpi_df_display,
         use_container_width=True,
         num_rows="fixed",
         hide_index=True,
         key="kpi_data_editor",
-        column_config={
-            "Date": st.column_config.TextColumn("Date", disabled=True)
-        }
+        column_config=kpi_column_config
     )
     
     # Save buttons
@@ -168,14 +193,17 @@ def main():
                     if 'kpi_data_editor' in st.session_state:
                         edit_data = st.session_state.kpi_data_editor
                         
+                        # Create reverse mapping from display names to punch codes
+                        reverse_mapping = {v: k for k, v in PUNCH_CODE_NAMES.items()}
+                        
                         # Apply edits from the editor if they exist
                         if 'edited_rows' in edit_data and edit_data['edited_rows']:
                             for row_idx, edits in edit_data['edited_rows'].items():
                                 row_idx = int(row_idx)  # Convert string index to integer
-                                for col, value in edits.items():
-                                    save_df.at[row_idx, col] = value
-                        
-                        # No need to handle added_rows or deleted_rows as they're not enabled in this interface
+                                for display_col, value in edits.items():
+                                    # Map display column back to original punch code
+                                    original_col = reverse_mapping.get(display_col, display_col)
+                                    save_df.at[row_idx, original_col] = value
                     
                     # Save using the updated dataframe
                     success = save_kpi_data(
