@@ -5,8 +5,6 @@
 # ├── requirements.txt          # Package dependencies
 # ├── README.md                 # Project documentation
 # ├── .gitignore                # Git ignore file
-# ├── tests/                    # Unit and integration tests
-# │   └── test_predict.py       # Tests for prediction functionality
 # ├── models/                   # Directory for saved models
 # │   └── .gitkeep              # Placeholder file
 # ├── data/                     # Data directory (for sample or cached data)

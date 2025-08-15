@@ -41,17 +41,69 @@ MODEL_CONFIGS = {
 }
 
 
-PUNCH_CODE_NAMES = {'202': 'Goods receive G',
-    '203': 'Goods receive D', 
-    '206': 'Replenishment',
-    '209': 'Sortation',
-    '210': 'Sortation pick',
-    '211': 'Misc pick',
-    '213': 'Old Astro',
-    '214': 'Large orders',
-    '215': 'Pick3PL_Astro',
-    '217': 'Return handling'
+PUNCH_CODE_NAMES = {
+    '202': 'Inlev Grossist',
+    '203': 'Inlev Förlag',
+    '206': 'Påfyllning',        
+    '209': 'Sorter',
+    '210': 'Inplock Sorter',
+    '211': 'OP',
+    '213': 'Ca Astro',
+    '214': 'Stororder',
+    '215': 'Inplock Nat',
+    '217': 'Returer'
 }
+
+PUNCH_CODE_PLANNING_METHODS = {
+    'KPI_BASED_WORKFORCE': ['206', '209', '210', '211', '213', '214', '215'],
+    'FIXED_WORKFORCE': ['202', '203', '217']
+}
+
+# Workforce limits configuration with regular workers and type
+PUNCH_CODE_WORKFORCE_LIMITS = {
+    '202': {'min_workers': 2, 'max_workers': 2, 'regular_workers': 2, 'type': 'fixed'},
+    '203': {'min_workers': 4, 'max_workers': 4, 'regular_workers': 4, 'type': 'fixed'},
+    '206': {'min_workers': 16, 'max_workers': 30, 'regular_workers': 24, 'type': 'kpi_based'},
+    '209': {'min_workers': 3, 'max_workers': 12, 'regular_workers': None, 'type': 'kpi_based'},
+    '210': {'min_workers': 2, 'max_workers': 8, 'regular_workers': None, 'type': 'kpi_based'},
+    '211': {'min_workers': 4, 'max_workers': 5, 'regular_workers': 4, 'type': 'kpi_based'},
+    '213': {'min_workers': 3, 'max_workers': 15, 'regular_workers': None, 'type': 'kpi_based'},
+    '214': {'min_workers': 2, 'max_workers': 10, 'regular_workers': None, 'type': 'kpi_based'},
+    '215': {'min_workers': 2, 'max_workers': 8, 'regular_workers': None, 'type': 'kpi_based'},
+    '217': {'min_workers': 2, 'max_workers': 2, 'regular_workers': 2, 'type': 'fixed'}
+}
+
+
+
+UI_CONFIG = {
+    'use_display_names_in_tables': True,
+    'show_punch_codes_in_tooltips': True,
+    'center_align_table_headers': True,
+    'center_align_table_content': True,
+    'include_workforce_info_in_tooltips': True
+}
+
+# Helper functions for the config
+def get_workforce_limits(punch_code):
+    """Get complete workforce configuration for a punch code"""
+    return PUNCH_CODE_WORKFORCE_LIMITS.get(str(punch_code), {
+        'min_workers': 1, 'max_workers': 20, 'regular_workers': None, 'type': 'kpi_based'
+    })
+
+def validate_workforce_prediction(punch_code, predicted_workers):
+    """Validate if predicted workers is within limits"""
+    limits = get_workforce_limits(punch_code)
+    return limits['min_workers'] <= predicted_workers <= limits['max_workers']
+
+def get_regular_workers(punch_code):
+    """Get regular worker count for punch code (fallback for fixed types)"""
+    limits = get_workforce_limits(punch_code)
+    return limits.get('regular_workers')
+
+def is_kpi_based_punch_code(punch_code):
+    """Check if punch code uses KPI-based planning"""
+    limits = get_workforce_limits(punch_code)
+    return limits.get('type') == 'kpi_based'
 
 # Ensure directories exist
 for directory in [MODELS_DIR, DATA_DIR, LOGS_DIR]:

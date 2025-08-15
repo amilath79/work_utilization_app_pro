@@ -26,7 +26,7 @@ git add .
 git commit -m "Initial commit - work utilization app without model files"
 
 # Add GitHub repository as remote
-git remote add origin https://github.com/amilath79/work_utilization_app.git
+git remote add origin https://github.com/amilath79/work_utilization_app_pro.git
 
 # Push to GitHub
 git push -u origin master

@@ -28,6 +28,10 @@ from config import SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, SQL_DATABAS
 from utils.sql_data_connector import load_demand_with_kpi_data
 from utils.demand_scheduler import DemandScheduler, shift_demand_forward, get_next_working_day
 
+# Add these imports after existing imports around line 15-20
+from utils.display_utils import get_display_name, transform_punch_code_columns, get_streamlit_column_config
+# from config import UI_CONFIG, PUNCH_CODE_NAMES, PUNCH_CODE_WORKFORCE_LIMITS
+
 # Configure page
 st.set_page_config(
     page_title="Next Day Prediction Accuracy",
@@ -71,7 +75,51 @@ def load_prediction_data(date_value):
         logger.error(f"Error loading prediction data: {str(e)}")
         logger.error(traceback.format_exc())
         return None
+
+
+def display_comparison_data(comparison_df):
+    """Enhanced display of comparison data with proper column names"""
     
+    # Format the comparison dataframe for display
+    display_df = comparison_df.copy()
+    
+    # Replace punch codes with display names in the PunchCode column
+    display_df['Work Type'] = display_df['PunchCode'].apply(
+        lambda x: get_display_name(x, use_table_format=True) if x != 'TOTAL' else 'TOTAL'
+    )
+    
+    # Reorder columns to show Work Type first
+    cols = ['Work Type'] + [col for col in display_df.columns if col not in ['Work Type', 'PunchCode']]
+    display_df = display_df[cols]
+    
+    # Drop the original PunchCode column
+    display_df = display_df.drop('PunchCode', axis=1)
+    
+    return display_df
+
+def create_quantity_kpi_display(quantity_kpi_df):
+    """Create enhanced quantity/KPI display with proper column names"""
+    
+    # Create display dataframes
+    quantity_display_df = quantity_kpi_df[['PunchCode', 'Quantity']].copy()
+    kpi_display_df = quantity_kpi_df[['PunchCode', 'KPI']].copy()
+    
+    # Transform to use display names as columns
+    quantity_data = {}
+    kpi_data = {}
+    
+    for _, row in quantity_kpi_df.iterrows():
+        punch_code = row['PunchCode']
+        display_name = get_display_name(punch_code, use_table_format=True)
+        quantity_data[display_name] = [row['Quantity']]
+        kpi_data[display_name] = [row['KPI']]
+    
+    quantity_transposed = pd.DataFrame(quantity_data, index=['Quantity'])
+    kpi_transposed = pd.DataFrame(kpi_data, index=['KPI'])
+    
+    return quantity_transposed, kpi_transposed
+
+
 def load_book_quantity_data():
     """
     Load book quantity data from the database for next working day
@@ -376,10 +424,11 @@ def send_email(comparison_df, current_date, next_date, workers_total_original, w
                         <th>Metric</th>
                 """
                 
-                # Add punch code headers
+                # Add punch code headers with display names
                 punch_codes = sorted(target_demand_data['Punchcode'].unique())
                 for punch_code in punch_codes:
-                    quantity_kpi_section += f"<th>{punch_code}</th>"
+                    display_name = get_display_name(punch_code, use_table_format=True)
+                    quantity_kpi_section += f'<th title="Code: {punch_code}">{display_name}</th>'
                 
                 quantity_kpi_section += "</tr>"
                 
@@ -448,12 +497,13 @@ def send_email(comparison_df, current_date, next_date, workers_total_original, w
         workers_df = comparison_df[['PunchCode', 'Original Workers', 'Improved Workers', 
                                    'Workers Difference']].copy()
         
-        # Add column headers for each punch code
+        # Add column headers for each punch code with display names
         for punch_code in workers_df['PunchCode']:
             if punch_code == 'TOTAL':
                 html += f'<th class="total-col">{punch_code}</th>'
             else:
-                html += f'<th>{punch_code}</th>'
+                display_name = get_display_name(punch_code, use_table_format=True)
+                html += f'<th title="Code: {punch_code}">{display_name}</th>'
         
         html += "</tr>"
         
@@ -497,7 +547,8 @@ def send_email(comparison_df, current_date, next_date, workers_total_original, w
             if punch_code == 'TOTAL':
                 html += f'<th class="total-col">{punch_code}</th>'
             else:
-                html += f'<th>{punch_code}</th>'
+                display_name = get_display_name(punch_code, use_table_format=True)
+                html += f'<th title="Code: {punch_code}">{display_name}</th>'
         
         html += "</tr>"
         
@@ -751,12 +802,16 @@ def main():
                     # Transpose workers dataframe
                     workers_transposed = workers_df.set_index('PunchCode').transpose()
                     
+                    # Transform workers display and create column config
+                    workers_display = transform_punch_code_columns(workers_transposed)
+                    workers_column_config = get_streamlit_column_config(workers_transposed.columns, "%.2f")
+
                     # Display workers dataframe
                     st.dataframe(
-                        workers_transposed,
+                        workers_display,
                         use_container_width=True,
-                        column_config={col: st.column_config.NumberColumn(col, format="%.2f") for col in workers_transposed.columns}
-                    )
+                        column_config=workers_column_config
+)
 
                 with hours_tab:
                     st.write("### Hours - Original vs. Improved Predictions")
@@ -771,11 +826,14 @@ def main():
                     # Transpose hours dataframe
                     hours_transposed = hours_df.set_index('PunchCode').transpose()
                     
+                    hours_display = transform_punch_code_columns(hours_transposed)
+                    hours_column_config = get_streamlit_column_config(hours_transposed.columns, "%.1f")
+
                     # Display hours dataframe
                     st.dataframe(
-                        hours_transposed,
+                        hours_display,
                         use_container_width=True,
-                        column_config={col: st.column_config.NumberColumn(col, format="%.1f") for col in hours_transposed.columns}
+                        column_config=hours_column_config
                     )
                 
                 # Calculate dual efficiency metrics
@@ -888,14 +946,8 @@ def main():
                         # Sort by punch code
                         quantity_kpi_df = quantity_kpi_df.sort_values('PunchCode')
                         
-                        # Create separate dataframes for numeric data only (to avoid Arrow serialization issues)
-                        # Quantity display dataframe
-                        quantity_display_df = quantity_kpi_df[['PunchCode', 'Quantity']].copy()
-                        quantity_transposed = quantity_display_df.set_index('PunchCode').transpose()
-                        
-                        # KPI display dataframe  
-                        kpi_display_df = quantity_kpi_df[['PunchCode', 'KPI']].copy()
-                        kpi_transposed = kpi_display_df.set_index('PunchCode').transpose()
+                        # Use the new function to create display dataframes
+                        quantity_transposed, kpi_transposed = create_quantity_kpi_display(quantity_kpi_df)
                         
                         # Ensure all columns are numeric for Arrow compatibility
                         for col in quantity_transposed.columns:
@@ -908,30 +960,26 @@ def main():
                         qty_column_config = {}
                         kpi_column_config = {}
                         
-                        for punch_code in quantity_transposed.columns:
-                            qty_column_config[punch_code] = st.column_config.NumberColumn(
-                                punch_code,
-                                format="%.0f",
-                                help=f"Quantity for punch code {punch_code}"
-                            )
-                            kpi_column_config[punch_code] = st.column_config.NumberColumn(
-                                punch_code,
-                                format="%.2f",
-                                help=f"KPI for punch code {punch_code}"
-                            )
-                        
+                        # Transform quantity and KPI displays
+                        quantity_display = transform_punch_code_columns(quantity_transposed)
+                        kpi_display = transform_punch_code_columns(kpi_transposed)
+
+                        # Create column configs
+                        qty_column_config = get_streamlit_column_config(quantity_transposed.columns, "%.0f")
+                        kpi_column_config = get_streamlit_column_config(kpi_transposed.columns, "%.2f")
+
                         # Display the quantity dataframe
                         st.write("### Quantity Analysis")
                         st.dataframe(
-                            quantity_transposed,
+                            quantity_display,
                             use_container_width=True,
                             column_config=qty_column_config
                         )
-                        
+
                         # Display the KPI dataframe
                         st.write("### KPI Analysis")
                         st.dataframe(
-                            kpi_transposed,
+                            kpi_display,
                             use_container_width=True,
                             column_config=kpi_column_config
                         )
