@@ -21,21 +21,21 @@ if df.empty:
     st.warning("No data found for the selected date range.")
     st.stop()
 
-# Metrics
-st.subheader("📊 Model Performance Metrics")
-col1, col2, col3 = st.columns(3)
+# # Metrics
+# st.subheader("📊 Model Performance Metrics")
+# col1, col2, col3 = st.columns(3)
 
-with col1:
-    mae = mean_absolute_error(df["ActualHours"], df["PredictedHours"])
-    st.metric("MAE (Hours)", f"{mae:.2f}")
+# with col1:
+#     mae = mean_absolute_error(df["ActualHours"], df["PredictedHours"])
+#     st.metric("MAE (Hours)", f"{mae:.2f}")
 
-with col2:
-    rmse = root_mean_squared_error(df["ActualHours"], df["PredictedHours"])
-    st.metric("RMSE (Hours)", f"{rmse:.2f}")
+# with col2:
+#     rmse = root_mean_squared_error(df["ActualHours"], df["PredictedHours"])
+#     st.metric("RMSE (Hours)", f"{rmse:.2f}")
 
-with col3:
-    mape = mean_absolute_percentage_error(df["ActualHours"], df["PredictedHours"])
-    st.metric("MAPE (Hours)", f"{mape:.2f}%")
+# with col3:
+#     mape = mean_absolute_percentage_error(df["ActualHours"], df["PredictedHours"])
+#     st.metric("MAPE (Hours)", f"{mape:.2f}%")
 
 # Visual comparison
 st.subheader("📈 Predicted vs Actual (Hours)")
