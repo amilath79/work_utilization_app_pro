@@ -21,7 +21,7 @@ from utils.feature_selection import FeatureSelector
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,  # Changed from INFO to WARNING
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(os.path.join("logs", "enhanced_training.log")),
@@ -135,7 +135,7 @@ def train_enhanced_model(df, work_type):
         logger.info(f"Test period: {X_test_final['Date'].min()} to {X_test_final['Date'].max()}")
 
         # TimeSeriesSplit for CV on training data only
-        tscv = TimeSeriesSplit(n_splits=5)
+        tscv = TimeSeriesSplit(n_splits=4)
         fold_scores = []
         feature_importances = None
 
@@ -217,10 +217,7 @@ def train_enhanced_model(df, work_type):
         trend_features = [col for col in feature_names if 'trend' in col.lower()]
         if trend_features and len([f for f in selected_features if 'trend' in f.lower()]) < 5:
             selected_features = list(set(selected_features + trend_features[:5]))
-            logger.info(f"Added trend features: {trend_features[:5]}")
-        
-        logger.info(f"Selected top {len(selected_features)} features for final model: {selected_features}")
-
+            logger.info(f"Selected top {len(selected_features)} features for final model: {selected_features}")
         # CRITICAL: Train final model on ALL training data (not including test set)
         complete_pipeline = Pipeline([
             ('feature_engineering', EnhancedFeatureTransformer()),
@@ -418,8 +415,13 @@ def main():
     parser = argparse.ArgumentParser(description='Train workforce prediction models')
     parser.add_argument('--punch-code', '-p', type=str, help='Train specific punch code (e.g., 211)')
     parser.add_argument('--all', action='store_true', help='Train all punch codes (default behavior)')
+    parser.add_argument('--quiet', '-q', action='store_true', help='Reduce logging for faster training')
     args = parser.parse_args()
     
+
+    if args.quiet:
+        logging.getLogger().setLevel(logging.ERROR)
+        logger.info("🔇 Quiet mode enabled - minimal logging")
     try:
         df = load_training_data()
         if df is None:
