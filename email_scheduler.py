@@ -249,138 +249,70 @@ def send_daily_prediction_email():
         return False
 
 def send_prediction_email(comparison_df, current_date, next_date, workers_total_original, workers_total_improved, hours_total_original, hours_total_improved):
-    """Send prediction email using existing email functionality"""
+    """Send prediction email using EXACT same format as Next Day Prediction page"""
     try:
-        # Email configuration (from existing code)
+        # Import the exact send_email function from the existing page
+        sys.path.append(os.path.join(os.path.dirname(__file__), 'pages'))
+        
+        # Use the exact same email function that already exists
+        from pages.7_Next_Day_Prediction import send_email
+        
+        # Call the existing send_email function with the same parameters
+        success = send_email(
+            comparison_df,
+            current_date,
+            next_date,
+            workers_total_original,
+            workers_total_improved,
+            hours_total_original,
+            hours_total_improved
+        )
+        
+        return success
+            
+    except Exception as e:
+        logger.error(f"Error sending prediction email: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        # Fallback to simplified email if the import fails
+        return send_simple_prediction_email(comparison_df, current_date, next_date)
+
+def send_simple_prediction_email(comparison_df, current_date, next_date):
+    """Fallback simple email if main function fails"""
+    try:
         sender_email = "noreply_wfp@forlagssystem.se"
         receiver_email = "amila.g@forlagssystem.se"
         smtp_server = "forlagssystem-se.mail.protection.outlook.com"
         
-        # Create message
         msg = MIMEMultipart("alternative")
         msg["Subject"] = f"Daily Workforce Prediction Report - {next_date.strftime('%Y-%m-%d')}"
         msg["From"] = sender_email
         msg["To"] = receiver_email
         
-        # Create HTML content (simplified version of existing email template)
+        # Simple HTML table
         html = f"""
-        <!DOCTYPE html>
         <html>
-        <head>
-            <style>
-                body {{ font-family: Arial, sans-serif; margin: 20px; }}
-                .header {{ background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }}
-                table {{ border-collapse: collapse; width: 100%; margin: 20px 0; }}
-                th, td {{ border: 1px solid #ddd; padding: 12px; text-align: center; }}
-                th {{ background-color: #f8f9fa; font-weight: bold; }}
-                .metric-row {{ background-color: #e9ecef; font-weight: bold; text-align: left; }}
-                .total-col {{ background-color: #d4edda; font-weight: bold; }}
-                .negative {{ color: #d32f2f; }}
-                .positive {{ color: #2e7d32; }}
-            </style>
-        </head>
         <body>
-            <div class="header">
-                <h2>Daily Workforce Prediction Report</h2>
-                <p>Date Generated: {current_date.strftime('%Y-%m-%d')} | Prediction For: {next_date.strftime('%Y-%m-%d (%A)')}</p>
-            </div>
-            
-            <h3>Workers (NoOfMan) Summary</h3>
-            <table>
-                <tr>
-                    <th>PunchCode</th>
-                    <th>Current Workers</th>
-                    <th>Predicted Workers</th>
-                    <th>Difference</th>
-                </tr>
+            <h2>Daily Workforce Prediction Report</h2>
+            <p>Date: {current_date} | For: {next_date}</p>
+            <table border='1'>
+                <tr><th>PunchCode</th><th>Workers</th><th>Hours</th></tr>
         """
         
-        # Add worker data rows
         for _, row in comparison_df.iterrows():
-            punch_code = row['PunchCode']
-            original = row['Original Workers']
-            improved = row['Improved Workers']
-            diff = row['Workers Difference']
-            
-            css_class = ""
-            if diff < 0:
-                css_class = 'class="negative"'
-            elif diff > 0:
-                css_class = 'class="positive"'
-                
-            total_class = 'class="total-col"' if punch_code == 'TOTAL' else ''
-            
-            html += f"""
-                <tr {total_class}>
-                    <td>{punch_code}</td>
-                    <td>{original:.1f}</td>
-                    <td>{improved:.1f}</td>
-                    <td {css_class}>{diff:+.1f}</td>
-                </tr>
-            """
+            html += f"<tr><td>{row['PunchCode']}</td><td>{row['Improved Workers']:.1f}</td><td>{row['Improved Hours']:.1f}</td></tr>"
         
-        html += """
-            </table>
-            
-            <h3>Hours Summary</h3>
-            <table>
-                <tr>
-                    <th>PunchCode</th>
-                    <th>Current Hours</th>
-                    <th>Predicted Hours</th>
-                    <th>Difference</th>
-                </tr>
-        """
+        html += "</table></body></html>"
         
-        # Add hours data rows
-        for _, row in comparison_df.iterrows():
-            punch_code = row['PunchCode']
-            original = row['Original Hours']
-            improved = row['Improved Hours']
-            diff = row['Hours Difference']
-            
-            css_class = ""
-            if diff < 0:
-                css_class = 'class="negative"'
-            elif diff > 0:
-                css_class = 'class="positive"'
-                
-            total_class = 'class="total-col"' if punch_code == 'TOTAL' else ''
-            
-            html += f"""
-                <tr {total_class}>
-                    <td>{punch_code}</td>
-                    <td>{original:.1f}</td>
-                    <td>{improved:.1f}</td>
-                    <td {css_class}>{diff:+.1f}</td>
-                </tr>
-            """
-        
-        html += """
-            </table>
-            
-            <p><strong>Note:</strong> This is an automated daily report generated at 19:00.</p>
-            <p>Generated by the Work Utilization Prediction system.</p>
-        </body>
-        </html>
-        """
-        
-        # Attach HTML content
         part = MIMEText(html, "html")
         msg.attach(part)
         
-        # Save report to file as backup
-        save_report_to_file(html, next_date)
-        
-        # Send email
         with smtplib.SMTP(smtp_server, 25, timeout=30) as server:
             server.send_message(msg)
-            logger.info(f"Email sent successfully to {receiver_email}")
             return True
             
     except Exception as e:
-        logger.error(f"Error sending prediction email: {str(e)}")
-        logger.error(traceback.format_exc())
+        logger.error(f"Fallback email also failed: {str(e)}")
         return False
 
 def save_report_to_file(html_content, next_date):
