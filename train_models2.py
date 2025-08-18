@@ -44,7 +44,6 @@ def load_training_data():
         WHERE PunchCode IN ('202', '203', '206', '209', '210', '211', '213', '214', '215', '217') 
         AND Hours > 0 
         AND SystemHours > 0 
-        AND Date < '2025-08-01'
         ORDER BY Date"""
         
         df = extract_sql_data(
