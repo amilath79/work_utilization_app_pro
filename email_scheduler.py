@@ -11,6 +11,7 @@ import logging
 import traceback
 import schedule
 import time
+import importlib.util
 from datetime import datetime, timedelta
 import pandas as pd
 import smtplib
@@ -252,10 +253,20 @@ def send_prediction_email(comparison_df, current_date, next_date, workers_total_
     """Send prediction email using EXACT same format as Next Day Prediction page"""
     try:
         # Import the exact send_email function from the existing page
-        sys.path.append(os.path.join(os.path.dirname(__file__), 'pages'))
+        pages_dir = os.path.join(os.path.dirname(__file__), 'pages')
+        sys.path.insert(0, pages_dir)
+        
+        # Import using importlib to handle the numeric filename
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "next_day_prediction", 
+            os.path.join(pages_dir, "7_Next_Day_Prediction.py")
+        )
+        next_day_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(next_day_module)
         
         # Use the exact same email function that already exists
-        from pages.7_Next_Day_Prediction import send_email
+        send_email = next_day_module.send_email
         
         # Call the existing send_email function with the same parameters
         success = send_email(
@@ -281,7 +292,7 @@ def send_simple_prediction_email(comparison_df, current_date, next_date):
     """Fallback simple email if main function fails"""
     try:
         sender_email = "noreply_wfp@forlagssystem.se"
-        receiver_email = "amila.g@forlagssystem.se"
+        receiver_email = "amila.g@forlagssystem.se, mattias.udd@forlagssystem.se"
         smtp_server = "forlagssystem-se.mail.protection.outlook.com"
         
         msg = MIMEMultipart("alternative")
