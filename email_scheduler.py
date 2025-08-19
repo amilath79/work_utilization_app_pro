@@ -27,15 +27,34 @@ from utils.prediction import predict_next_day
 from utils.demand_scheduler import get_next_working_day
 from config import SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join("logs", "email_scheduler.log")),
-        logging.StreamHandler()
-    ]
-)
+# Configure logging with better error handling
+log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+os.makedirs(log_dir, exist_ok=True)
+
+# Use a different log file name with timestamp to avoid conflicts
+log_filename = f"email_scheduler_{datetime.now().strftime('%Y%m%d')}.log"
+log_filepath = os.path.join(log_dir, log_filename)
+
+try:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_filepath, mode='a'),
+            logging.StreamHandler()
+        ]
+    )
+except PermissionError:
+    # If we can't write to log file, just use console logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler()
+        ]
+    )
+    print(f"Warning: Could not write to log file {log_filepath}. Using console logging only.")
+
 logger = logging.getLogger("email_scheduler")
 
 # Ensure logs directory exists
