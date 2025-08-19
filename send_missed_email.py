@@ -8,17 +8,18 @@ import os
 import sys
 import logging
 import argparse
+import pandas as pd
+import traceback
 from datetime import datetime, timedelta
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from email_scheduler import (
-    load_training_data, load_prediction_data, create_comparison_data, 
-    send_email, load_enhanced_models
-)
+from utils.sql_data_connector import extract_sql_data, load_demand_with_kpi_data
+from utils.data_loader import load_enhanced_models
 from utils.prediction import predict_next_day
 from utils.demand_scheduler import get_next_working_day
+from config import SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION
 
 # Configure logging
 logging.basicConfig(
@@ -26,6 +27,119 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("send_missed_email")
+
+def load_training_data():
+    """Load training data for predictions"""
+    try:
+        logger.info("Loading training data for email predictions")
+        query = """
+        SELECT Date, PunchCode as WorkType, Hours, SystemHours, 
+        CASE WHEN PunchCode IN (206, 213) THEN NoRows
+        ELSE Quantity END as Quantity
+        FROM WorkUtilizationData 
+        WHERE PunchCode IN ('202', '203', '206', '209', '210', '211', '213', '214', '215', '217') 
+        AND Hours > 0 
+        AND SystemHours > 0 
+        AND Date < CAST(GETDATE() AS DATE)
+        ORDER BY Date
+        """
+        
+        df = extract_sql_data(
+            server=SQL_SERVER,
+            database=SQL_DATABASE,
+            query=query,
+            trusted_connection=SQL_TRUSTED_CONNECTION
+        )
+        
+        if df is None or df.empty:
+            logger.error("No training data loaded")
+            return None
+            
+        df['Date'] = pd.to_datetime(df['Date'])
+        df['WorkType'] = df['WorkType'].astype(str)
+        
+        logger.info(f"Loaded {len(df)} records for email prediction")
+        return df
+        
+    except Exception as e:
+        logger.error(f"Error loading training data: {str(e)}")
+        return None
+
+def load_prediction_data(date_value):
+    """Load existing prediction data from database"""
+    try:
+        sql_query = f"""
+        SELECT ID, Date, PunchCode, NoOfMan, Hours, PredictionType, Username, 
+               CreatedDate, LastModifiedDate
+        FROM PredictionData WHERE PunchCode in (209,211, 213, 214, 215, 202, 203, 206, 210, 217)
+        AND Date = '{date_value}'
+        ORDER BY PunchCode
+        """
+        
+        df = extract_sql_data(
+            server=SQL_SERVER,
+            database=SQL_DATABASE,
+            query=sql_query,
+            trusted_connection=SQL_TRUSTED_CONNECTION
+        )
+        
+        if df is not None and not df.empty:
+            df['Date'] = pd.to_datetime(df['Date'])
+            df['PunchCode'] = df['PunchCode'].astype(str)
+            return df
+        else:
+            logger.warning("No prediction data found in database")
+            return None
+            
+    except Exception as e:
+        logger.error(f"Error loading prediction data: {str(e)}")
+        return None
+
+def create_comparison_data(original_predictions, improved_predictions_workers, improved_predictions_hours):
+    """Create comparison data for email"""
+    comparison_data = []
+    
+    # Process each punch code in original predictions
+    for _, row in original_predictions.iterrows():
+        punch_code = str(row['PunchCode'])
+        original_workers = row['NoOfMan']
+        original_hours = row['Hours']
+        
+        # Get improved predictions for this punch code
+        improved_workers = improved_predictions_workers.get(punch_code, 0)
+        improved_hours = improved_predictions_hours.get(punch_code, 0)
+        
+        # Calculate differences
+        workers_diff = improved_workers - original_workers
+        hours_diff = improved_hours - original_hours
+        
+        comparison_data.append({
+            'PunchCode': punch_code,
+            'Original Workers': original_workers,
+            'Improved Workers': improved_workers,
+            'Original Hours': original_hours,
+            'Improved Hours': improved_hours,
+            'Workers Difference': workers_diff,
+            'Hours Difference': hours_diff
+        })
+    
+    # Add entries for punch codes that are only in improved predictions
+    for punch_code in improved_predictions_workers.keys():
+        if punch_code not in original_predictions['PunchCode'].astype(str).values:
+            improved_workers = improved_predictions_workers[punch_code]
+            improved_hours = improved_predictions_hours[punch_code]
+            
+            comparison_data.append({
+                'PunchCode': punch_code,
+                'Original Workers': 0,
+                'Improved Workers': improved_workers,
+                'Original Hours': 0,
+                'Improved Hours': improved_hours,
+                'Workers Difference': improved_workers,
+                'Hours Difference': improved_hours
+            })
+    
+    return comparison_data
 
 def send_email_for_date(target_date):
     """Send prediction email for a specific date"""
@@ -88,7 +202,7 @@ def send_email_for_date(target_date):
         comparison_df = pd.concat([comparison_df, pd.DataFrame([total_row])], ignore_index=True)
         
         # Send email for this specific date
-        success = send_email(
+        success = send_prediction_email(
             comparison_df,
             datetime.now().date(),  # Current date as generation date
             target_date,            # Target date for predictions
@@ -160,5 +274,4 @@ def main():
     return success
 
 if __name__ == "__main__":
-    import pandas as pd  # Add this import
     main()
