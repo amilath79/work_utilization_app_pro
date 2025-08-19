@@ -21,6 +21,11 @@ from utils.prediction import predict_next_day
 from utils.demand_scheduler import get_next_working_day
 from config import SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION
 
+# Email imports
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -140,6 +145,270 @@ def create_comparison_data(original_predictions, improved_predictions_workers, i
             })
     
     return comparison_data
+
+def send_prediction_email(comparison_df, current_date, next_date, workers_total_original, workers_total_improved, hours_total_original, hours_total_improved):
+    """Send prediction email using EXACT same format as Next Day Prediction page"""
+    try:
+        # Email configuration
+        sender_email = "noreply_wfp@forlagssystem.se"
+        receiver_email = "amila.g@forlagssystem.se, mattias.udd@forlagssystem.se"
+        smtp_server = "forlagssystem-se.mail.protection.outlook.com"
+        
+        # Create message
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"Workforce Prediction Report - {next_date.strftime('%Y-%m-%d')} (Manual Send)"
+        msg["From"] = sender_email
+        msg["To"] = receiver_email
+        
+        # Load quantity/KPI data for email
+        demand_kpi_df = load_demand_with_kpi_data(next_date.strftime('%Y-%m-%d'))
+        quantity_kpi_section = ""
+        
+        if demand_kpi_df is not None and not demand_kpi_df.empty:
+            target_demand_data = demand_kpi_df[
+                demand_kpi_df['PlanDate'].dt.date == next_date
+            ]
+            
+            if not target_demand_data.empty:
+                # Create quantity and KPI table for email
+                quantity_kpi_section = """
+                <h3>Quantity and KPI Analysis</h3>
+                <table>
+                    <tr>
+                        <th>Metric</th>
+                """
+                
+                # Add punch code headers
+                punch_codes = sorted(target_demand_data['Punchcode'].unique())
+                for punch_code in punch_codes:
+                    quantity_kpi_section += f'<th>{punch_code}</th>'
+                
+                quantity_kpi_section += '</tr>'
+                
+                # Add rows for each metric
+                metrics = ['Quantity', 'KPI', 'Calculated Hours']
+                
+                for metric in metrics:
+                    quantity_kpi_section += f'<tr><td class="metric-row">{metric}</td>'
+                    
+                    for punch_code in punch_codes:
+                        punch_data = target_demand_data[target_demand_data['Punchcode'] == punch_code]
+                        
+                        if not punch_data.empty:
+                            row = punch_data.iloc[0]
+                            
+                            if metric == 'Quantity':
+                                if punch_code in ['206', '213']:
+                                    value = row['nrows']
+                                else:
+                                    value = row['Quantity']
+                            elif metric == 'KPI':
+                                value = row['KPIValue']
+                            else:  # Calculated Hours
+                                if punch_code in ['206', '213']:
+                                    quantity = row['nrows']
+                                else:
+                                    quantity = row['Quantity']
+                                kpi = row['KPIValue']
+                                value = quantity / kpi / 8 if kpi > 0 else 0
+                            
+                            quantity_kpi_section += f'<td>{value:.2f}</td>'
+                        else:
+                            quantity_kpi_section += '<td>-</td>'
+                    
+                    quantity_kpi_section += '</tr>'
+                
+                quantity_kpi_section += '</table>'
+        
+        # Create HTML email using the EXACT format from the original
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 30px; text-align: center; }}
+                .summary-section {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+                .metrics-grid {{ display: flex; justify-content: space-around; margin: 20px 0; }}
+                .metric-card {{ background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; min-width: 120px; }}
+                table {{ border-collapse: collapse; width: 100%; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
+                th, td {{ border: 1px solid #e0e0e0; padding: 12px; text-align: center; }}
+                th {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; }}
+                .metric-row {{ background-color: #e3f2fd; font-weight: bold; text-align: left; color: #1976d2; }}
+                .total-col {{ background-color: #e8f5e8; font-weight: bold; }}
+                .negative {{ color: #d32f2f; font-weight: bold; }}
+                .positive {{ color: #2e7d32; font-weight: bold; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h2>Workforce Prediction Report (Manual Send)</h2>
+                <p>Date Generated: {current_date.strftime('%Y-%m-%d')} | Prediction For: {next_date.strftime('%Y-%m-%d (%A)')}</p>
+            </div>
+            
+            <h3>Workers (NoOfMan) Comparison</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+        """
+        
+        # Get workers data for email
+        workers_df = comparison_df[['PunchCode', 'Original Workers', 'Improved Workers', 
+                                   'Workers Difference']].copy()
+        
+        # Add column headers for each punch code
+        for punch_code in workers_df['PunchCode']:
+            if punch_code == 'TOTAL':
+                html += f'<th class="total-col">{punch_code}</th>'
+            else:
+                html += f'<th>{punch_code}</th>'
+        
+        html += "</tr>"
+        
+        # Add rows for each metric
+        metrics = ['Original Workers', 'Improved Workers', 'Workers Difference']
+        
+        workers_transposed = workers_df.set_index('PunchCode').transpose()
+        
+        for metric in metrics:
+            html += f'<tr><td class="metric-row">{metric}</td>'
+            
+            for punch_code in workers_transposed.columns:
+                value = workers_transposed.loc[metric, punch_code]
+                
+                # Format value based on metric type
+                formatted_value = f"{value:.2f}"
+                
+                # Apply styling based on value and metric
+                css_class = ""
+                if metric in ['Workers Difference'] and value < 0:
+                    css_class = 'class="negative"'
+                elif metric in ['Workers Difference'] and value > 0:
+                    css_class = 'class="positive"'
+                
+                if punch_code == 'TOTAL':
+                    html += f'<td class="total-col" {css_class}>{formatted_value}</td>'
+                else:
+                    html += f'<td {css_class}>{formatted_value}</td>'
+            
+            html += '</tr>'
+        
+        html += "</table>"
+        
+        # Add Hours table
+        html += "<h3>Hours Comparison</h3><table><tr><th>Metric</th>"
+        
+        # Get hours data for email
+        hours_df = comparison_df[['PunchCode', 'Original Hours', 'Improved Hours', 
+                                 'Hours Difference']].copy()
+        
+        # Add column headers
+        for punch_code in hours_df['PunchCode']:
+            if punch_code == 'TOTAL':
+                html += f'<th class="total-col">{punch_code}</th>'
+            else:
+                html += f'<th>{punch_code}</th>'
+        
+        html += "</tr>"
+        
+        # Add rows for hours metrics
+        hours_metrics = ['Original Hours', 'Improved Hours', 'Hours Difference']
+        hours_transposed = hours_df.set_index('PunchCode').transpose()
+        
+        for metric in hours_metrics:
+            html += f'<tr><td class="metric-row">{metric}</td>'
+            
+            for punch_code in hours_transposed.columns:
+                value = hours_transposed.loc[metric, punch_code]
+                formatted_value = f"{value:.0f}"
+                
+                css_class = ""
+                if metric in ['Hours Difference'] and value < 0:
+                    css_class = 'class="negative"'
+                elif metric in ['Hours Difference'] and value > 0:
+                    css_class = 'class="positive"'
+                
+                if punch_code == 'TOTAL':
+                    html += f'<td class="total-col" {css_class}>{formatted_value}</td>'
+                else:
+                    html += f'<td {css_class}>{formatted_value}</td>'
+            
+            html += '</tr>'
+        
+        html += "</table>"
+        
+        # Add the quantity/KPI section if available
+        html += quantity_kpi_section
+        
+        # Add summary metrics
+        workers_change = workers_total_improved - workers_total_original
+        hours_change = hours_total_improved - hours_total_original
+        
+        html += f"""
+            <div class="summary-section">
+                <h3>📊 Summary Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #1976d2;">{workers_total_improved:.0f}</div>
+                        <div class="metric-label">Total Workers</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #1976d2;">{hours_total_improved:.0f}</div>
+                        <div class="metric-label">Total Hours</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: {'#2e7d32' if workers_change <= 0 else '#d32f2f'};">{workers_change:+.0f}</div>
+                        <div class="metric-label">Workers Change</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: {'#2e7d32' if hours_change <= 0 else '#d32f2f'};">{hours_change:+.0f}</div>
+                        <div class="metric-label">Hours Change</div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <p><strong>Note:</strong> This is a manually generated report for {next_date.strftime('%Y-%m-%d')}.</p>
+            <p>Generated by the Work Utilization Prediction system.</p>
+        </body>
+        </html>
+        """
+        
+        # Attach HTML content
+        part = MIMEText(html, "html")
+        msg.attach(part)
+        
+        # Save report to file as backup
+        save_report_to_file(html, next_date)
+        
+        # Send email using only Standard SMTP on port 25
+        with smtplib.SMTP(smtp_server, 25, timeout=30) as server:
+            server.send_message(msg)
+            logger.info(f"Email sent successfully to {receiver_email}")
+            return True
+            
+    except Exception as e:
+        logger.error(f"Error sending email: {str(e)}")
+        logger.error(traceback.format_exc())
+        return False
+
+def save_report_to_file(html_content, next_date):
+    """Save the report as an HTML file"""
+    try:
+        reports_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reports")
+        os.makedirs(reports_dir, exist_ok=True)
+        
+        filename = f"manual_prediction_email_{next_date.strftime('%Y-%m-%d')}.html"
+        filepath = os.path.join(reports_dir, filename)
+        
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(html_content)
+        
+        logger.info(f"Report saved to file: {filepath}")
+        return filepath
+    except Exception as e:
+        logger.error(f"Error saving report to file: {str(e)}")
+        return False
 
 def send_email_for_date(target_date):
     """Send prediction email for a specific date"""
