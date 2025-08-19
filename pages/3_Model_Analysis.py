@@ -16,6 +16,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.visualization import plot_feature_importance, plot_metrics_comparison
 from utils.data_loader import load_models
 from config import MODELS_DIR
+from utils.data_loader import load_models, load_enhanced_models  # Add load_enhanced_models
 
 # Configure page
 st.set_page_config(
@@ -48,16 +49,26 @@ def ensure_models():
     # Check if we have models
     if st.session_state.models is None:
         with st.spinner("Loading models..."):
-            models, feature_importances, metrics = load_models()
+            # Try enhanced models first
+            enhanced_models, enhanced_metadata, enhanced_features = load_enhanced_models()
             
-            if models:
-                st.session_state.models = models
-                st.session_state.feature_importances = feature_importances
-                st.session_state.metrics = metrics
+            if enhanced_models:
+                st.session_state.models = enhanced_models
+                st.session_state.feature_importances = {}  # Enhanced models store importance differently
+                st.session_state.metrics = {}  # Will be populated from metadata
+                
+                # Extract metrics from enhanced metadata
+                for work_type, metadata in enhanced_metadata.items():
+                    st.session_state.metrics[work_type] = {
+                        'MAE': metadata.get('test_mae', 0),
+                        'RMSE': metadata.get('test_rmse', 0),
+                        'R²': metadata.get('test_r2', 0),
+                        'MAPE': metadata.get('test_mape', 0)
+                    }
             else:
-                st.error("No trained models available. Please train models first.")
+                st.error("No trained models available. Please run train_models2.py first.")
                 return False
-    
+            
     return True
 
 def display_model_performance(metrics, nn_metrics=None):
@@ -101,27 +112,27 @@ def display_model_performance(metrics, nn_metrics=None):
         )
         
         # Simple bar chart for MAE
-        st.subheader("Random Forest: MAE by Work Type")
+        # st.subheader("Random Forest: MAE by Work Type")
         
         # Sort by MAE for the chart
-        chart_df = metrics_df.sort_values('MAE').head(15)  # Limit to top 15 for readability
+        # chart_df = metrics_df.sort_values('MAE').head(15)  # Limit to top 15 for readability
         
-        fig = px.bar(
-            chart_df,
-            x='Work Type',
-            y='MAE',
-            title='Random Forest: Mean Absolute Error by Work Type',
-            color='MAE',
-            color_continuous_scale='RdYlGn_r',  # Red for high error, green for low
-        )
+        # fig = px.bar(
+        #     chart_df,
+        #     x='Work Type',
+        #     y='MAE',
+        #     title='Random Forest: Mean Absolute Error by Work Type',
+        #     color='MAE',
+        #     color_continuous_scale='RdYlGn_r',  # Red for high error, green for low
+        # )
         
-        fig.update_layout(
-            xaxis_title='Work Type',
-            yaxis_title='Mean Absolute Error (MAE)',
-            xaxis={'categoryorder': 'total ascending'}
-        )
+        # fig.update_layout(
+        #     xaxis_title='Work Type',
+        #     yaxis_title='Mean Absolute Error (MAE)',
+        #     xaxis={'categoryorder': 'total ascending'}
+        # )
         
-        st.plotly_chart(fig, use_container_width=True)
+        # st.plotly_chart(fig, use_container_width=True)
         
     elif model_type == "Neural Network":
         # Check if Neural Network metrics are available

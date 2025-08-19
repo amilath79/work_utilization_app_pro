@@ -120,81 +120,146 @@ def load_models():
 @st.cache_resource
 def load_combined_models():
     """
-    Load both standard and basic models and combine them into a single dictionary
-    
+    Load enhanced complete pipeline models (replaces old standard/basic loading).
+    These pipelines include: Feature Engineering -> Preprocessing -> LightGBM Model
+
     Returns:
     --------
     tuple
-        (combined_models_dict, combined_feature_importances_dict, combined_metrics_dict)
+        (combined_models_dict, combined_metadata_dict, combined_input_features_dict)
     """
     try:
-        # Load standard models
-        standard_models_path = os.path.join(MODELS_DIR, 'work_utilization_models.pkl')
-        standard_feature_importances_path = os.path.join(MODELS_DIR, 'work_utilization_feature_importances.pkl')
-        standard_metrics_path = os.path.join(MODELS_DIR, 'work_utilization_metrics.pkl')
-        
-        # Load basic models
-        basic_models_path = os.path.join(MODELS_DIR, 'work_utilization_basic_models.pkl')
-        basic_feature_importances_path = os.path.join(MODELS_DIR, 'work_utilization_basic_feature_importances.pkl')
-        basic_metrics_path = os.path.join(MODELS_DIR, 'work_utilization_basic_metrics.pkl')
-        
-        # Initialize dictionaries
+        import glob
+        import json
+
         combined_models = {}
-        combined_feature_importances = {}
-        combined_metrics = {}
-        
-        # Check and load standard models if they exist
-        if os.path.exists(standard_models_path):
-            with open(standard_models_path, 'rb') as f:
-                standard_models = pickle.load(f)
-            
-            with open(standard_feature_importances_path, 'rb') as f:
-                standard_feature_importances = pickle.load(f)
-            
-            with open(standard_metrics_path, 'rb') as f:
-                standard_metrics = pickle.load(f)
-            
-            # Add to combined dictionaries
-            combined_models.update(standard_models)
-            combined_feature_importances.update(standard_feature_importances)
-            combined_metrics.update(standard_metrics)
-            
-            logger.info(f"Standard models loaded successfully. Number of models: {len(standard_models)}")
+        combined_metadata = {}
+        combined_input_features = {}
+
+        # Load enhanced models for all punch codes
+        punch_codes = ENHANCED_WORK_TYPES
+
+        for punch_code in punch_codes:
+            model_file = os.path.join(MODELS_DIR, f'enhanced_model_{punch_code}.pkl')
+
+            if os.path.exists(model_file):
+                with open(model_file, 'rb') as f:
+                    pipeline = pickle.load(f)
+                    combined_models[punch_code] = pipeline
+                    logger.info(f"✅ Loaded enhanced pipeline for punch code {punch_code}")
+
+                    # Log pipeline steps for verification
+                    if hasattr(pipeline, 'steps'):
+                        steps = [step[0] for step in pipeline.steps]
+                        logger.info(f"   Pipeline steps: {steps}")
+            else:
+                logger.warning(f"Enhanced pipeline file not found: {model_file}")
+
+        # Load enhanced metadata (latest JSON file)
+        metadata_files = glob.glob(os.path.join(MODELS_DIR, 'enhanced_models_metadata_*.json'))
+        if metadata_files:
+            latest_metadata_file = max(metadata_files, key=os.path.getmtime)
+            with open(latest_metadata_file, 'r') as f:
+                combined_metadata = json.load(f)
+                logger.info(f"✅ Loaded enhanced metadata from {latest_metadata_file}")
+
+                # Extract input features for each punch code
+                for punch_code in combined_models.keys():
+                    if punch_code in combined_metadata:
+                        combined_input_features[punch_code] = combined_metadata[punch_code].get(
+                            'input_features',
+                            ['Date', 'WorkType', 'NoOfMan', 'Quantity']
+                        )
+
+        if combined_models:
+            logger.info(f"🚀 Enhanced models loaded successfully. Available punch codes: {list(combined_models.keys())}")
         else:
-            logger.warning("Standard model files not found")
-        
-        # Check and load basic models if they exist
-        if os.path.exists(basic_models_path):
-            with open(basic_models_path, 'rb') as f:
-                basic_models = pickle.load(f)
-            
-            with open(basic_feature_importances_path, 'rb') as f:
-                basic_feature_importances = pickle.load(f)
-            
-            with open(basic_metrics_path, 'rb') as f:
-                basic_metrics = pickle.load(f)
-            
-            # Add to combined dictionaries
-            combined_models.update(basic_models)
-            combined_feature_importances.update(basic_feature_importances)
-            combined_metrics.update(basic_metrics)
-            
-            logger.info(f"Basic models loaded successfully. Number of models: {len(basic_models)}")
-        else:
-            logger.warning("Basic model files not found")
-        
-        # Check if any models were loaded
-        if not combined_models:
-            logger.error("No models were found in either model directory")
-            return {}, {}, {}
-        
-        logger.info(f"Combined models loaded successfully. Total number of models: {len(combined_models)}")
-        return combined_models, combined_feature_importances, combined_metrics
-    
+            logger.warning("No enhanced models found")
+
+        return combined_models, combined_metadata, combined_input_features
+
     except Exception as e:
-        logger.error(f"Error loading combined models: {str(e)}")
+        logger.error(f"Error loading enhanced models: {str(e)}")
         logger.error(traceback.format_exc())
         return {}, {}, {}
+
+# def load_combined_models():
+    # """
+    # Load both standard and basic models and combine them into a single dictionary
+    
+    # Returns:
+    # --------
+    # tuple
+    #     (combined_models_dict, combined_feature_importances_dict, combined_metrics_dict)
+    # """
+    # try:
+    #     # Load standard models
+    #     standard_models_path = os.path.join(MODELS_DIR, 'work_utilization_models.pkl')
+    #     standard_feature_importances_path = os.path.join(MODELS_DIR, 'work_utilization_feature_importances.pkl')
+    #     standard_metrics_path = os.path.join(MODELS_DIR, 'work_utilization_metrics.pkl')
+        
+    #     # Load basic models
+    #     basic_models_path = os.path.join(MODELS_DIR, 'work_utilization_basic_models.pkl')
+    #     basic_feature_importances_path = os.path.join(MODELS_DIR, 'work_utilization_basic_feature_importances.pkl')
+    #     basic_metrics_path = os.path.join(MODELS_DIR, 'work_utilization_basic_metrics.pkl')
+        
+    #     # Initialize dictionaries
+    #     combined_models = {}
+    #     combined_feature_importances = {}
+    #     combined_metrics = {}
+        
+    #     # Check and load standard models if they exist
+    #     if os.path.exists(standard_models_path):
+    #         with open(standard_models_path, 'rb') as f:
+    #             standard_models = pickle.load(f)
+            
+    #         with open(standard_feature_importances_path, 'rb') as f:
+    #             standard_feature_importances = pickle.load(f)
+            
+    #         with open(standard_metrics_path, 'rb') as f:
+    #             standard_metrics = pickle.load(f)
+            
+    #         # Add to combined dictionaries
+    #         combined_models.update(standard_models)
+    #         combined_feature_importances.update(standard_feature_importances)
+    #         combined_metrics.update(standard_metrics)
+            
+    #         logger.info(f"Standard models loaded successfully. Number of models: {len(standard_models)}")
+    #     else:
+    #         logger.warning("Standard model files not found")
+        
+    #     # Check and load basic models if they exist
+    #     if os.path.exists(basic_models_path):
+    #         with open(basic_models_path, 'rb') as f:
+    #             basic_models = pickle.load(f)
+            
+    #         with open(basic_feature_importances_path, 'rb') as f:
+    #             basic_feature_importances = pickle.load(f)
+            
+    #         with open(basic_metrics_path, 'rb') as f:
+    #             basic_metrics = pickle.load(f)
+            
+    #         # Add to combined dictionaries
+    #         combined_models.update(basic_models)
+    #         combined_feature_importances.update(basic_feature_importances)
+    #         combined_metrics.update(basic_metrics)
+            
+    #         logger.info(f"Basic models loaded successfully. Number of models: {len(basic_models)}")
+    #     else:
+    #         logger.warning("Basic model files not found")
+        
+    #     # Check if any models were loaded
+    #     if not combined_models:
+    #         logger.error("No models were found in either model directory")
+    #         return {}, {}, {}
+        
+    #     logger.info(f"Combined models loaded successfully. Total number of models: {len(combined_models)}")
+    #     return combined_models, combined_feature_importances, combined_metrics
+    
+    # except Exception as e:
+    #     logger.error(f"Error loading combined models: {str(e)}")
+    #     logger.error(traceback.format_exc())
+    #     return {}, {}, {}
 
 def save_models(models, feature_importances, metrics):
     """
