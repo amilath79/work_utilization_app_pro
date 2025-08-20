@@ -675,5 +675,100 @@ def load_utilization_vs_prediction(start_date, end_date):
 
 
         
-
+def save_email_predictions_to_db(predictions_dict, hours_dict, username, server=None, database=None):
+    """
+    Save email predictions to EmaildPredictionData table (always replaces existing)
+    
+    Parameters:
+    -----------
+    predictions_dict : dict
+        Dictionary of predictions with dates as keys and worktype predictions as values
+    hours_dict : dict
+        Dictionary of hour predictions with dates as keys and worktype hours as values
+    username : str
+        Username who made the prediction
+    server : str, optional
+        SQL Server name (defaults to configured SQL_SERVER)
+    database : str, optional
+        Database name (defaults to configured SQL_DATABASE)
+        
+    Returns:
+    --------
+    bool
+        True if successful, False if error occurred
+    """
+    try:
+        # Get configured values if not provided
+        server = server or SQL_SERVER
+        database = database or SQL_DATABASE
+        
+        logger.info(f"Starting save_email_predictions_to_db with username: {username}")
+        logger.info(f"Connecting to {server}/{database}")
+        
+        # Connect to database
+        conn = SQLDataConnector.connect_to_sql(
+            server=server,
+            database=database,
+            trusted_connection=SQL_TRUSTED_CONNECTION
+        )
+        
+        if not conn:
+            logger.error("Failed to connect to database")
+            return False
+        
+        cursor = conn.cursor()
+        success_count = 0
+        error_count = 0
+        
+        # Process each date and work type
+        for date, work_type_predictions in predictions_dict.items():
+            date_str = date.strftime('%Y-%m-%d') if hasattr(date, 'strftime') else str(date)
+            
+            for work_type, man_value in work_type_predictions.items():
+                try:
+                    punch_code_int = int(work_type)
+                    hours_value = hours_dict.get(date, {}).get(work_type, 0)
+                    
+                    # Execute stored procedure for email predictions
+                    cursor.execute(
+                        "EXEC usp_SaveEmailPrediction ?, ?, ?, ?, ?",
+                        date_str, 
+                        punch_code_int, 
+                        float(man_value),
+                        float(hours_value),
+                        username
+                    )
+                    
+                    conn.commit()
+                    success_count += 1
+                    logger.info(f"Successfully saved email prediction for {date_str}, {punch_code_int}")
+                    
+                except Exception as item_error:
+                    logger.error(f"Error processing email prediction for date={date}, work_type={work_type}: {str(item_error)}")
+                    error_count += 1
+                    try:
+                        conn.rollback()
+                    except:
+                        pass
+        
+        logger.info(f"Successfully saved {success_count} email predictions to EmaildPredictionData")
+        if error_count > 0:
+            logger.warning(f"Failed to save {error_count} email predictions due to errors")
+        
+        return success_count > 0
+        
+    except Exception as e:
+        logger.error(f"Error saving email predictions to database: {str(e)}")
+        return False
+    finally:
+        if 'cursor' in locals() and cursor:
+            try:
+                cursor.close()
+            except:
+                pass
+        if 'conn' in locals() and conn:
+            try:
+                conn.close()
+            except:
+                pass
         

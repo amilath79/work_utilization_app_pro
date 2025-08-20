@@ -48,7 +48,7 @@ PUNCH_CODE_NAMES = {
     '209': 'Sorter',
     '210': 'Inplock Sorter',
     '211': 'OP',
-    '213': 'Ca Astro',
+    '213': 'GA Astro',
     '214': 'Stororder',
     '215': 'Inplock Nat',
     '217': 'Returer'

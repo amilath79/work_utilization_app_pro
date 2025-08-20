@@ -17,6 +17,7 @@ import pandas as pd
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from utils.sql_data_connector import save_email_predictions_to_db
 
 # Add parent directory to path to import from utils
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -258,11 +259,28 @@ def send_daily_prediction_email():
         
         if success:
             logger.info("✅ Daily prediction email sent successfully")
+            # Convert improved predictions to the required format
+            predictions_for_email_db = {next_date: new_predictions}  # {date: {punch_code: workers}}
+            hours_for_email_db = {next_date: new_hours}  # {date: {punch_code: hours}}
+
+            # Save to EmaildPredictionData table with PredictionType = 'E'
+            email_save_success = save_email_predictions_to_db(
+                predictions_for_email_db, 
+                hours_for_email_db, 
+                "email_scheduler"
+            )
+
+            if email_save_success:
+                logger.info(f"✅ Successfully saved email predictions to EmaildPredictionData for {next_date}")
+            else:
+                logger.warning(f"⚠️ Failed to save email predictions to EmaildPredictionData for {next_date}")
+            
             return True
         else:
             logger.error("❌ Failed to send daily prediction email")
             return False
-            
+        
+        
     except Exception as e:
         logger.error(f"❌ Error in send_daily_prediction_email: {str(e)}")
         logger.error(traceback.format_exc())

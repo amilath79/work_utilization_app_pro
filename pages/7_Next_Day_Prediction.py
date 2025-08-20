@@ -396,7 +396,7 @@ def send_email(comparison_df, current_date, next_date, workers_total_original, w
     try:
         # Email configuration
         sender_email = "noreply_wfp@forlagssystem.se"
-        receiver_email = "amila.g@forlagssystem.se, mattias.udd@forlagssystem.se" #david.skoglund@forlagssystem.se,
+        receiver_email = "amila.g@forlagssystem.se, david.skoglund@forlagssystem.se, mattias.udd@forlagssystem.se" #
         smtp_server = "forlagssystem-se.mail.protection.outlook.com"
         
         # Create message
@@ -810,8 +810,7 @@ def main():
                     st.dataframe(
                         workers_display,
                         use_container_width=True,
-                        column_config=workers_column_config
-)
+                        column_config=workers_column_config)
 
                 with hours_tab:
                     st.write("### Hours - Original vs. Improved Predictions")
@@ -904,6 +903,24 @@ def main():
                             st.success("Report created successfully! If email sending failed, the report was saved as an HTML file.")
                         else:
                             st.error("Failed to send email and save report. Check logs for details.")
+
+                        if success:
+                            if st.button("💾 Save Email Predictions to EmaildPredictionData"):
+                                from utils.sql_data_connector import save_email_predictions_to_db
+                                
+                                predictions_for_email_db = {next_working_day: improved_predictions_workers}
+                                hours_for_email_db = {next_working_day: improved_predictions_hours}
+                                
+                                email_save_success = save_email_predictions_to_db(
+                                    predictions_for_email_db, 
+                                    hours_for_email_db, 
+                                    "next_day_web_user"
+                                )
+                                
+                                if email_save_success:
+                                    st.success("✅ Email predictions saved to EmaildPredictionData!")
+                                else:
+                                    st.error("❌ Failed to save email predictions")
             
             with tab2:
                 st.subheader("Quantity and KPI Analysis")
