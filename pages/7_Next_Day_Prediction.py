@@ -250,6 +250,7 @@ def calculate_improved_prediction(prediction_df, book_quantity_df, target_date):
                         workers = 0
                         hours = 0
                     else:
+                        print(f"Quantity: {quantity}, KPI: {kpi_value} punch_code :{punch_code}" )
                         workers = quantity / kpi_value / 8
                         workers = math.ceil(workers)
                         hours = workers * 8  # Calculate hours from workers
