@@ -17,6 +17,7 @@ import pyodbc
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from utils.holiday_utils import is_working_day_for_punch_code
 import math
 # Add parent directory to path to import from utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -205,6 +206,7 @@ def calculate_improved_prediction(prediction_df, book_quantity_df, target_date):
     """
     Calculate improved prediction using hybrid approach - demand-based for specific punch codes
     Returns both hours and workers (NoOfMan) predictions
+    FIXED VERSION: Now respects PUNCH_CODE_WORKING_RULES
     """
     try:
         improved_predictions_hours = {}
@@ -232,6 +234,15 @@ def calculate_improved_prediction(prediction_df, book_quantity_df, target_date):
             
             # Calculate demand-based predictions for specific punch codes
             for punch_code in DEMAND_BASED_PUNCH_CODES:
+                # CRITICAL FIX: Check if this punch code works on target date
+                is_working, reason = is_working_day_for_punch_code(target_date_dt, punch_code)
+                
+                if not is_working:
+                    improved_predictions_workers[punch_code] = 0
+                    improved_predictions_hours[punch_code] = 0
+                    logger.info(f"📅 Punch Code {punch_code}: No work on {target_date_dt.strftime('%A')} - {reason}")
+                    continue
+                
                 punch_data = target_demand_data[target_demand_data['Punchcode'] == punch_code]
                 
                 if not punch_data.empty:
@@ -250,7 +261,6 @@ def calculate_improved_prediction(prediction_df, book_quantity_df, target_date):
                         workers = 0
                         hours = 0
                     else:
-                        print(f"Quantity: {quantity}, KPI: {kpi_value} punch_code :{punch_code}" )
                         workers = quantity / kpi_value / 8
                         workers = math.ceil(workers)
                         hours = workers * 8  # Calculate hours from workers
@@ -266,6 +276,15 @@ def calculate_improved_prediction(prediction_df, book_quantity_df, target_date):
         ml_punch_codes = ['202', '203', '206', '210', '214', '217'] 
         
         for punch_code in ml_punch_codes:
+            # CRITICAL FIX: Check if this punch code works on target date
+            is_working, reason = is_working_day_for_punch_code(target_date_dt, punch_code)
+            
+            if not is_working:
+                improved_predictions_workers[punch_code] = 0
+                improved_predictions_hours[punch_code] = 0
+                logger.info(f"📅 Punch Code {punch_code}: No work on {target_date_dt.strftime('%A')} - {reason}")
+                continue
+            
             if prediction_df is not None and not prediction_df.empty:
                 punch_predictions = prediction_df[prediction_df['PunchCode'] == punch_code]
                 
