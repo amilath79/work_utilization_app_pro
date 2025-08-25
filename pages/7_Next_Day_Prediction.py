@@ -22,7 +22,7 @@ import math
 # Add parent directory to path to import from utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.state_manager import StateManager
+from utils.state_manager import StateManagercal
 from utils.sql_data_connector import extract_sql_data, load_demand_forecast_data
 from utils.prediction import predict_next_day
 from config import SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, SQL_DATABASE_LIVE
