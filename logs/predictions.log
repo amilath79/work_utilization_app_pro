@@ -1,0 +1,153 @@
+2025-08-26 12:40:58.079 WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
+2025-08-26 12:40:58,105 | daily_predictions | INFO | \U0001f552 Using default behavior: next working day
+2025-08-26 12:40:58,105 | daily_predictions | INFO | \U0001f552 Prediction process started at: 2025-08-26 12:40:58
+2025-08-26 12:40:58,105 | daily_predictions | INFO | \U0001f50d Verifying database connection...
+2025-08-26 12:40:58,106 | utils.sql_data_connector | INFO | Connecting to 192.168.1.43/ABC
+C:\forlagssystem\app\utils\sql_data_connector.py:88: UserWarning: pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy.
+  for chunk in pd.read_sql(query, conn, chunksize=chunk_size):
+2025-08-26 12:40:58,422 | utils.sql_data_connector | INFO | Fetched chunk of 1 rows
+2025-08-26 12:40:58,423 | utils.sql_data_connector | INFO | Total rows fetched: 1
+2025-08-26 12:40:58,437 | daily_predictions | INFO | \u2705 Database connection verified. Records available: 19219
+2025-08-26 12:40:58,438 | daily_predictions | INFO | ============================================================
+2025-08-26 12:40:58,438 | daily_predictions | INFO | \U0001f680 STARTING DAILY NEXT DAY PREDICTION
+2025-08-26 12:40:58,438 | daily_predictions | INFO | ============================================================
+2025-08-26 12:40:58,438 | daily_predictions | INFO | Loading training data for next day prediction
+2025-08-26 12:40:58,438 | utils.sql_data_connector | INFO | Connecting to 192.168.1.43/ABC
+2025-08-26 12:40:58,820 | utils.sql_data_connector | INFO | Fetched chunk of 10000 rows
+2025-08-26 12:40:58,887 | utils.sql_data_connector | INFO | Fetched chunk of 5988 rows
+2025-08-26 12:40:58,889 | utils.sql_data_connector | INFO | Total rows fetched: 15988
+2025-08-26 12:40:58,913 | daily_predictions | INFO | Loaded 15988 records for prediction
+2025-08-26 12:40:58,913 | daily_predictions | INFO | Data date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:40:58,914 | daily_predictions | INFO | Loading enhanced models...
+2025-08-26 12:40:58.914 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-08-26 12:40:59.380 
+  [33m[1mWarning:[0m to view this Streamlit app on a browser, run it with the following
+  command:
+
+    streamlit run daily_predictions.py [ARGUMENTS]
+2025-08-26 12:40:59.381 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-08-26 12:40:59.381 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-08-26 12:40:59,564 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 202
+2025-08-26 12:40:59,564 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,588 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 203
+2025-08-26 12:40:59,588 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,610 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 206
+2025-08-26 12:40:59,611 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,635 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 209
+2025-08-26 12:40:59,635 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,658 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 210
+2025-08-26 12:40:59,658 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,681 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 211
+2025-08-26 12:40:59,682 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,706 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 213
+2025-08-26 12:40:59,706 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,729 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 214
+2025-08-26 12:40:59,729 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,754 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 215
+2025-08-26 12:40:59,754 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,780 | utils.data_loader | INFO | \u2705 Loaded complete pipeline for punch code 217
+2025-08-26 12:40:59,780 | utils.data_loader | INFO |    Pipeline steps: ['feature_engineering', 'feature_selection', 'model']
+2025-08-26 12:40:59,811 | utils.data_loader | INFO | \u2705 Loaded pipeline metadata from C:/forlogssystems/Models\enhanced_models_metadata_20250826_124055.json
+2025-08-26 12:40:59,811 | utils.data_loader | INFO | \U0001f680 Complete pipelines loaded successfully. Available punch codes: ['202', '203', '206', '209', '210', '211', '213', '214', '215', '217']
+2025-08-26 12:40:59,811 | utils.data_loader | INFO |    Each pipeline handles: Feature Engineering -> Preprocessing -> Prediction
+2025-08-26 12:40:59.811 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-08-26 12:40:59.812 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-08-26 12:40:59,812 | daily_predictions | INFO | \u2705 Loaded models for work types: ['202', '203', '206', '209', '210', '211', '213', '214', '215', '217']
+2025-08-26 12:40:59,812 | daily_predictions | INFO | Generating predictions...
+2025-08-26 12:40:59,812 | utils.prediction | INFO | \U0001f3af Predicting for 2025-08-26
+2025-08-26 12:40:59,818 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 202
+2025-08-26 12:40:59,918 | utils.prediction | INFO | \u2705 202: 18.1 hours (Historical avg: 16.6)
+2025-08-26 12:40:59,921 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 203
+2025-08-26 12:40:59,974 | utils.prediction | INFO | \u2705 203: 28.2 hours (Historical avg: 41.2)
+2025-08-26 12:40:59,977 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 206
+2025-08-26 12:41:00,026 | utils.prediction | INFO | \u2705 206: 246.1 hours (Historical avg: 168.9)
+2025-08-26 12:41:00,028 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 209
+2025-08-26 12:41:00,073 | utils.prediction | INFO | \u2705 209: 108.2 hours (Historical avg: 70.4)
+2025-08-26 12:41:00,075 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 210
+2025-08-26 12:41:00,123 | utils.prediction | INFO | \u2705 210: 69.4 hours (Historical avg: 59.1)
+2025-08-26 12:41:00,125 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 211
+2025-08-26 12:41:00,169 | utils.prediction | INFO | \u2705 211: 57.2 hours (Historical avg: 78.4)
+2025-08-26 12:41:00,171 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 213
+2025-08-26 12:41:00,214 | utils.prediction | INFO | \u2705 213: 30.7 hours (Historical avg: 25.5)
+2025-08-26 12:41:00,216 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 214
+2025-08-26 12:41:00,264 | utils.prediction | INFO | \u2705 214: 50.1 hours (Historical avg: 43.8)
+2025-08-26 12:41:00,266 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 215
+2025-08-26 12:41:00,314 | utils.prediction | INFO | \u2705 215: 70.3 hours (Historical avg: 48.6)
+2025-08-26 12:41:00,316 | utils.prediction | INFO | Using exact same day last year: 2024-08-26 00:00:00 for 217
+2025-08-26 12:41:00,366 | utils.prediction | INFO | \u2705 217: 26.2 hours (Historical avg: 29.4)
+2025-08-26 12:41:00,367 | daily_predictions | INFO | \U0001f4c5 Generated predictions for: 2025-08-26
+2025-08-26 12:41:00,367 | daily_predictions | INFO | 
+\U0001f4ca PREDICTION SUMMARY:
+2025-08-26 12:41:00,367 | daily_predictions | INFO | ----------------------------------------
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 202: 2 workers, 18.1 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 203: 4 workers, 28.2 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 206: 31 workers, 246.1 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 209: 14 workers, 108.2 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 210: 9 workers, 69.4 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 211: 7 workers, 57.2 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 213: 4 workers, 30.7 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 214: 6 workers, 50.1 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 215: 9 workers, 70.3 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | Work Type 217: 3 workers, 26.2 hours
+2025-08-26 12:41:00,367 | daily_predictions | INFO | ----------------------------------------
+2025-08-26 12:41:00,367 | daily_predictions | INFO | TOTAL: 89 workers, 704.5 hours
+2025-08-26 12:41:00,370 | daily_predictions | INFO | \U0001f4be Saving predictions to database for user: amila.g
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Starting save_predictions_to_db with username: amila.g
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Connecting to 192.168.1.43/ABC
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Number of dates in predictions: 1
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Total predictions to save: 10
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Database connection successful
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Processing predictions for date: 2025-08-26
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Processing work type: 202, Man Power: 2
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Hours value for 202: 18.13748237320314
+2025-08-26 12:41:00,370 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=202, NoOfMan=2.0, Hours=18.13748237320314, Username=amila.g
+2025-08-26 12:41:00,396 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 202
+2025-08-26 12:41:00,396 | utils.sql_data_connector | INFO | Processing work type: 203, Man Power: 4
+2025-08-26 12:41:00,396 | utils.sql_data_connector | INFO | Hours value for 203: 28.179512501834836
+2025-08-26 12:41:00,396 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=203, NoOfMan=4.0, Hours=28.179512501834836, Username=amila.g
+2025-08-26 12:41:00,419 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 203
+2025-08-26 12:41:00,420 | utils.sql_data_connector | INFO | Processing work type: 206, Man Power: 31
+2025-08-26 12:41:00,420 | utils.sql_data_connector | INFO | Hours value for 206: 246.0603954712849
+2025-08-26 12:41:00,420 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=206, NoOfMan=31.0, Hours=246.0603954712849, Username=amila.g
+2025-08-26 12:41:00,444 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 206
+2025-08-26 12:41:00,444 | utils.sql_data_connector | INFO | Processing work type: 209, Man Power: 14
+2025-08-26 12:41:00,444 | utils.sql_data_connector | INFO | Hours value for 209: 108.21050513171745
+2025-08-26 12:41:00,444 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=209, NoOfMan=14.0, Hours=108.21050513171745, Username=amila.g
+2025-08-26 12:41:00,467 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 209
+2025-08-26 12:41:00,468 | utils.sql_data_connector | INFO | Processing work type: 210, Man Power: 9
+2025-08-26 12:41:00,468 | utils.sql_data_connector | INFO | Hours value for 210: 69.44511599855082
+2025-08-26 12:41:00,468 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=210, NoOfMan=9.0, Hours=69.44511599855082, Username=amila.g
+2025-08-26 12:41:00,491 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 210
+2025-08-26 12:41:00,492 | utils.sql_data_connector | INFO | Processing work type: 211, Man Power: 7
+2025-08-26 12:41:00,492 | utils.sql_data_connector | INFO | Hours value for 211: 57.176684663148656
+2025-08-26 12:41:00,492 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=211, NoOfMan=7.0, Hours=57.176684663148656, Username=amila.g
+2025-08-26 12:41:00,515 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 211
+2025-08-26 12:41:00,515 | utils.sql_data_connector | INFO | Processing work type: 213, Man Power: 4
+2025-08-26 12:41:00,516 | utils.sql_data_connector | INFO | Hours value for 213: 30.670232959277648
+2025-08-26 12:41:00,516 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=213, NoOfMan=4.0, Hours=30.670232959277648, Username=amila.g
+2025-08-26 12:41:00,539 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 213
+2025-08-26 12:41:00,539 | utils.sql_data_connector | INFO | Processing work type: 214, Man Power: 6
+2025-08-26 12:41:00,539 | utils.sql_data_connector | INFO | Hours value for 214: 50.12713457022151
+2025-08-26 12:41:00,540 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=214, NoOfMan=6.0, Hours=50.12713457022151, Username=amila.g
+2025-08-26 12:41:00,563 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 214
+2025-08-26 12:41:00,564 | utils.sql_data_connector | INFO | Processing work type: 215, Man Power: 9
+2025-08-26 12:41:00,564 | utils.sql_data_connector | INFO | Hours value for 215: 70.34326297604515
+2025-08-26 12:41:00,564 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=215, NoOfMan=9.0, Hours=70.34326297604515, Username=amila.g
+2025-08-26 12:41:00,587 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 215
+2025-08-26 12:41:00,588 | utils.sql_data_connector | INFO | Processing work type: 217, Man Power: 3
+2025-08-26 12:41:00,588 | utils.sql_data_connector | INFO | Hours value for 217: 26.197018745872786
+2025-08-26 12:41:00,588 | utils.sql_data_connector | INFO | Executing stored procedure with params: Date=2025-08-26, PunchCode=217, NoOfMan=3.0, Hours=26.197018745872786, Username=amila.g
+2025-08-26 12:41:00,612 | utils.sql_data_connector | INFO | Successfully executed stored procedure for 2025-08-26 00:00:00, 217
+2025-08-26 12:41:00,612 | utils.sql_data_connector | INFO | Successfully saved 10 predictions to database
+2025-08-26 12:41:00,627 | daily_predictions | INFO | \u2705 Predictions successfully saved to database
+2025-08-26 12:41:00,627 | daily_predictions | INFO | 
+\U0001f4be SAVE SUMMARY:
+2025-08-26 12:41:00,628 | daily_predictions | INFO |    Date: 2025-08-26
+2025-08-26 12:41:00,628 | daily_predictions | INFO |    Work Types: 10
+2025-08-26 12:41:00,628 | daily_predictions | INFO |    Total Predictions: 10
+2025-08-26 12:41:00,628 | daily_predictions | INFO |    User: amila.g
+2025-08-26 12:41:00,628 | daily_predictions | INFO |    Timestamp: 2025-08-26 12:41:00
+2025-08-26 12:41:00,628 | daily_predictions | INFO | ============================================================
+2025-08-26 12:41:00,629 | daily_predictions | INFO | \U0001f389 PREDICTION PROCESS COMPLETED SUCCESSFULLY
+2025-08-26 12:41:00,629 | daily_predictions | INFO | \u23f1\ufe0f  Duration: 2.5 seconds
+2025-08-26 12:41:00,629 | daily_predictions | INFO | ============================================================

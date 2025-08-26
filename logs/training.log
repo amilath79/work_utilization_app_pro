@@ -1,0 +1,326 @@
+The system cannot find the path specified.
+The system cannot find the path specified.
+2025-08-26 12:16:24,495 | enhanced_train_models | INFO | Loading training data for enhanced models ['202', '203', '206', '209', '210', '211', '213', '214', '215', '217']
+2025-08-26 12:16:24,495 | utils.sql_data_connector | INFO | Connecting to 192.168.1.43/ABC
+C:\forlagssystem\app\utils\sql_data_connector.py:88: UserWarning: pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy.
+  for chunk in pd.read_sql(query, conn, chunksize=chunk_size):
+2025-08-26 12:16:25,146 | utils.sql_data_connector | INFO | Fetched chunk of 10000 rows
+2025-08-26 12:16:25,219 | utils.sql_data_connector | INFO | Fetched chunk of 5988 rows
+2025-08-26 12:16:25,220 | utils.sql_data_connector | INFO | Total rows fetched: 15988
+2025-08-26 12:16:25,244 | enhanced_train_models | INFO | Loaded 15988 records for enhanced training
+2025-08-26 12:16:25,245 | enhanced_train_models | INFO | Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,245 | enhanced_train_models | INFO | \U0001f3af Training all available models: ['203', '206', '202', '211', '213', '209', '210', '215', '214', '217']
+2025-08-26 12:16:25,245 | enhanced_train_models | INFO | \U0001f4ca Data distribution:
+2025-08-26 12:16:25,247 | enhanced_train_models | INFO |   WorkType 203: 1548 records
+2025-08-26 12:16:25,248 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,248 | enhanced_train_models | INFO |     Hours avg: 41.24
+2025-08-26 12:16:25,250 | enhanced_train_models | INFO |   WorkType 206: 1893 records
+2025-08-26 12:16:25,250 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,250 | enhanced_train_models | INFO |     Hours avg: 168.87
+2025-08-26 12:16:25,252 | enhanced_train_models | INFO |   WorkType 202: 1545 records
+2025-08-26 12:16:25,252 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,252 | enhanced_train_models | INFO |     Hours avg: 16.55
+2025-08-26 12:16:25,254 | enhanced_train_models | INFO |   WorkType 211: 1621 records
+2025-08-26 12:16:25,254 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,254 | enhanced_train_models | INFO |     Hours avg: 78.44
+2025-08-26 12:16:25,256 | enhanced_train_models | INFO |   WorkType 213: 1548 records
+2025-08-26 12:16:25,256 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,256 | enhanced_train_models | INFO |     Hours avg: 25.47
+2025-08-26 12:16:25,258 | enhanced_train_models | INFO |   WorkType 209: 1550 records
+2025-08-26 12:16:25,258 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,258 | enhanced_train_models | INFO |     Hours avg: 70.35
+2025-08-26 12:16:25,260 | enhanced_train_models | INFO |   WorkType 210: 1585 records
+2025-08-26 12:16:25,261 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,261 | enhanced_train_models | INFO |     Hours avg: 59.08
+2025-08-26 12:16:25,263 | enhanced_train_models | INFO |   WorkType 215: 1711 records
+2025-08-26 12:16:25,263 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,263 | enhanced_train_models | INFO |     Hours avg: 48.61
+2025-08-26 12:16:25,265 | enhanced_train_models | INFO |   WorkType 214: 1568 records
+2025-08-26 12:16:25,265 | enhanced_train_models | INFO |     Date range: 2019-07-01 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,265 | enhanced_train_models | INFO |     Hours avg: 43.84
+2025-08-26 12:16:25,267 | enhanced_train_models | INFO |   WorkType 217: 1419 records
+2025-08-26 12:16:25,267 | enhanced_train_models | INFO |     Date range: 2019-07-04 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,267 | enhanced_train_models | INFO |     Hours avg: 29.37
+2025-08-26 12:16:25,268 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 203
+2025-08-26 12:16:25,269 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 203 using complete pipeline
+2025-08-26 12:16:25,271 | enhanced_train_models | INFO | Applied log1p transformation for punch code 203
+2025-08-26 12:16:25,272 | enhanced_train_models | INFO | Data split - Train/CV: 1239 samples, Final Test: 309 samples
+2025-08-26 12:16:25,272 | enhanced_train_models | INFO | Test period: 2024-05-29 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:16:25,272 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:17:56,300 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:18:37,168 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 203
+2025-08-26 12:18:37,168 | enhanced_train_models | INFO |    Test MAE: 6.223 (on 309 samples)
+2025-08-26 12:18:37,168 | enhanced_train_models | INFO |    Test R²: 0.078
+2025-08-26 12:18:37,168 | enhanced_train_models | INFO |    Test MAPE: 18.73%
+2025-08-26 12:18:37,168 | enhanced_train_models | INFO |    CV MAE: 7.285 (avg of 4 folds)
+2025-08-26 12:18:37,168 | enhanced_train_models | INFO |    CV R²: -0.162
+2025-08-26 12:18:37,168 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 203
+2025-08-26 12:18:37,169 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 206
+2025-08-26 12:18:37,171 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 206 using complete pipeline
+2025-08-26 12:18:37,173 | enhanced_train_models | INFO | Applied log1p transformation for punch code 206
+2025-08-26 12:18:37,174 | enhanced_train_models | INFO | Data split - Train/CV: 1515 samples, Final Test: 378 samples
+2025-08-26 12:18:37,174 | enhanced_train_models | INFO | Test period: 2024-05-31 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:18:37,174 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:20:52,705 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:20:52,705 | enhanced_train_models | INFO | Selected top 30 features for final model: ['Day', 'DayOfWeek', 'Hours_trend_slope_30', 'SystemHours', 'DayOfWeek_cos', 'Quantity_3d_avg', 'Cumulative_Quantity', 'Quantity_lag_1', 'Quantity_trend_strength_90', 'Quantity_rolling_mean_14', 'Quantity_lag_7', 'WeekNo', 'Quantity_trend_acceleration', 'Quantity_lag_30', 'Quantity_rolling_mean_28', 'Quantity_rolling_std_28', 'Quantity', 'DayOfWeek_sin', 'Quantity_rolling_std_7', 'Quantity_trend_strength_7', 'IsWeekend', 'Quantity_rolling_mean_7', 'Hours_trend_strength_30', 'Hours_trend_strength_7', 'Hours_detrended_7', 'WeekNo_cos', 'Hours_trend_slope_7', 'Month', 'Month_cos', 'Quantity_SystemHours']
+2025-08-26 12:21:57,780 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 206
+2025-08-26 12:21:57,780 | enhanced_train_models | INFO |    Test MAE: 24.056 (on 378 samples)
+2025-08-26 12:21:57,780 | enhanced_train_models | INFO |    Test R²: 0.826
+2025-08-26 12:21:57,780 | enhanced_train_models | INFO |    Test MAPE: 16.38%
+2025-08-26 12:21:57,780 | enhanced_train_models | INFO |    CV MAE: 25.776 (avg of 4 folds)
+2025-08-26 12:21:57,781 | enhanced_train_models | INFO |    CV R²: 0.738
+2025-08-26 12:21:57,782 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 206
+2025-08-26 12:21:57,782 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 202
+2025-08-26 12:21:57,784 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 202 using complete pipeline
+2025-08-26 12:21:57,786 | enhanced_train_models | INFO | Applied log1p transformation for punch code 202
+2025-08-26 12:21:57,786 | enhanced_train_models | INFO | Data split - Train/CV: 1236 samples, Final Test: 309 samples
+2025-08-26 12:21:57,787 | enhanced_train_models | INFO | Test period: 2024-06-03 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:21:57,787 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:23:30,780 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:24:12,312 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 202
+2025-08-26 12:24:12,313 | enhanced_train_models | INFO |    Test MAE: 4.992 (on 309 samples)
+2025-08-26 12:24:12,313 | enhanced_train_models | INFO |    Test R²: 0.261
+2025-08-26 12:24:12,313 | enhanced_train_models | INFO |    Test MAPE: 24.16%
+2025-08-26 12:24:12,313 | enhanced_train_models | INFO |    CV MAE: 3.531 (avg of 4 folds)
+2025-08-26 12:24:12,313 | enhanced_train_models | INFO |    CV R²: 0.241
+2025-08-26 12:24:12,314 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 202
+2025-08-26 12:24:12,314 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 211
+2025-08-26 12:24:12,316 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 211 using complete pipeline
+2025-08-26 12:24:12,318 | enhanced_train_models | INFO | Applied log1p transformation for punch code 211
+2025-08-26 12:24:12,318 | enhanced_train_models | INFO | Data split - Train/CV: 1297 samples, Final Test: 324 samples
+2025-08-26 12:24:12,319 | enhanced_train_models | INFO | Test period: 2024-05-30 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:24:12,319 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:25:55,418 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:26:40,602 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 211
+2025-08-26 12:26:40,602 | enhanced_train_models | INFO |    Test MAE: 10.317 (on 324 samples)
+2025-08-26 12:26:40,602 | enhanced_train_models | INFO |    Test R²: 0.657
+2025-08-26 12:26:40,602 | enhanced_train_models | INFO |    Test MAPE: 16.52%
+2025-08-26 12:26:40,602 | enhanced_train_models | INFO |    CV MAE: 11.093 (avg of 4 folds)
+2025-08-26 12:26:40,602 | enhanced_train_models | INFO |    CV R²: 0.686
+2025-08-26 12:26:40,603 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 211
+2025-08-26 12:26:40,604 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 213
+2025-08-26 12:26:40,605 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 213 using complete pipeline
+2025-08-26 12:26:40,607 | enhanced_train_models | INFO | Applied log1p transformation for punch code 213
+2025-08-26 12:26:40,608 | enhanced_train_models | INFO | Data split - Train/CV: 1239 samples, Final Test: 309 samples
+2025-08-26 12:26:40,609 | enhanced_train_models | INFO | Test period: 2024-06-03 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:26:40,609 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:28:13,709 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:29:00,122 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 213
+2025-08-26 12:29:00,122 | enhanced_train_models | INFO |    Test MAE: 8.674 (on 309 samples)
+2025-08-26 12:29:00,122 | enhanced_train_models | INFO |    Test R²: 0.471
+2025-08-26 12:29:00,122 | enhanced_train_models | INFO |    Test MAPE: 40.33%
+2025-08-26 12:29:00,122 | enhanced_train_models | INFO |    CV MAE: 10.919 (avg of 4 folds)
+2025-08-26 12:29:00,122 | enhanced_train_models | INFO |    CV R²: -0.037
+2025-08-26 12:29:00,124 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 213
+2025-08-26 12:29:00,125 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 209
+2025-08-26 12:29:00,127 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 209 using complete pipeline
+2025-08-26 12:29:00,128 | enhanced_train_models | INFO | Applied log1p transformation for punch code 209
+2025-08-26 12:29:00,129 | enhanced_train_models | INFO | Data split - Train/CV: 1240 samples, Final Test: 310 samples
+2025-08-26 12:29:00,129 | enhanced_train_models | INFO | Test period: 2024-05-31 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:29:00,129 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:30:38,782 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:31:27,852 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 209
+2025-08-26 12:31:27,852 | enhanced_train_models | INFO |    Test MAE: 10.379 (on 310 samples)
+2025-08-26 12:31:27,852 | enhanced_train_models | INFO |    Test R²: 0.841
+2025-08-26 12:31:27,852 | enhanced_train_models | INFO |    Test MAPE: 14.62%
+2025-08-26 12:31:27,852 | enhanced_train_models | INFO |    CV MAE: 10.311 (avg of 4 folds)
+2025-08-26 12:31:27,852 | enhanced_train_models | INFO |    CV R²: 0.798
+2025-08-26 12:31:27,853 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 209
+2025-08-26 12:31:27,854 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 210
+2025-08-26 12:31:27,856 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 210 using complete pipeline
+2025-08-26 12:31:27,858 | enhanced_train_models | INFO | Applied log1p transformation for punch code 210
+2025-08-26 12:31:27,858 | enhanced_train_models | INFO | Data split - Train/CV: 1268 samples, Final Test: 317 samples
+2025-08-26 12:31:27,859 | enhanced_train_models | INFO | Test period: 2024-06-13 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:31:27,859 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:33:06,814 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:33:49,811 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 210
+2025-08-26 12:33:49,811 | enhanced_train_models | INFO |    Test MAE: 6.702 (on 317 samples)
+2025-08-26 12:33:49,811 | enhanced_train_models | INFO |    Test R²: 0.889
+2025-08-26 12:33:49,811 | enhanced_train_models | INFO |    Test MAPE: 10.10%
+2025-08-26 12:33:49,811 | enhanced_train_models | INFO |    CV MAE: 6.227 (avg of 4 folds)
+2025-08-26 12:33:49,811 | enhanced_train_models | INFO |    CV R²: 0.883
+2025-08-26 12:33:49,812 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 210
+2025-08-26 12:33:49,813 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 215
+2025-08-26 12:33:49,814 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 215 using complete pipeline
+2025-08-26 12:33:49,816 | enhanced_train_models | INFO | Applied log1p transformation for punch code 215
+2025-08-26 12:33:49,817 | enhanced_train_models | INFO | Data split - Train/CV: 1369 samples, Final Test: 342 samples
+2025-08-26 12:33:49,817 | enhanced_train_models | INFO | Test period: 2024-05-23 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:33:49,817 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:35:42,518 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:36:36,023 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 215
+2025-08-26 12:36:36,023 | enhanced_train_models | INFO |    Test MAE: 5.852 (on 342 samples)
+2025-08-26 12:36:36,023 | enhanced_train_models | INFO |    Test R²: 0.890
+2025-08-26 12:36:36,023 | enhanced_train_models | INFO |    Test MAPE: 12.20%
+2025-08-26 12:36:36,023 | enhanced_train_models | INFO |    CV MAE: 5.307 (avg of 4 folds)
+2025-08-26 12:36:36,024 | enhanced_train_models | INFO |    CV R²: 0.912
+2025-08-26 12:36:36,025 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 215
+2025-08-26 12:36:36,025 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 214
+2025-08-26 12:36:36,027 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 214 using complete pipeline
+2025-08-26 12:36:36,029 | enhanced_train_models | INFO | Applied log1p transformation for punch code 214
+2025-08-26 12:36:36,029 | enhanced_train_models | INFO | Data split - Train/CV: 1255 samples, Final Test: 313 samples
+2025-08-26 12:36:36,030 | enhanced_train_models | INFO | Test period: 2024-06-12 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:36:36,030 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:38:11,830 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:38:53,162 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 214
+2025-08-26 12:38:53,162 | enhanced_train_models | INFO |    Test MAE: 9.198 (on 313 samples)
+2025-08-26 12:38:53,163 | enhanced_train_models | INFO |    Test R²: 0.744
+2025-08-26 12:38:53,163 | enhanced_train_models | INFO |    Test MAPE: 16.06%
+2025-08-26 12:38:53,163 | enhanced_train_models | INFO |    CV MAE: 5.020 (avg of 4 folds)
+2025-08-26 12:38:53,163 | enhanced_train_models | INFO |    CV R²: 0.801
+2025-08-26 12:38:53,165 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 214
+2025-08-26 12:38:53,166 | enhanced_train_models | INFO | 
+\U0001f3af Processing WorkType 217
+2025-08-26 12:38:53,167 | enhanced_train_models | INFO | Training enhanced LightGBM model for WorkType 217 using complete pipeline
+2025-08-26 12:38:53,169 | enhanced_train_models | INFO | Applied log1p transformation for punch code 217
+2025-08-26 12:38:53,170 | enhanced_train_models | INFO | Data split - Train/CV: 1136 samples, Final Test: 283 samples
+2025-08-26 12:38:53,170 | enhanced_train_models | INFO | Test period: 2024-05-28 00:00:00 to 2025-08-25 00:00:00
+2025-08-26 12:38:53,170 | enhanced_train_models | INFO | Performing time series cross-validation on training data...
+2025-08-26 12:40:18,461 | enhanced_train_models | INFO | Trend features created: 24 - ['Hours_trend_slope_7', 'Hours_trend_strength_7', 'Hours_detrended_7', 'Hours_trend_slope_30', 'Hours_trend_strength_30']
+2025-08-26 12:40:55,074 | enhanced_train_models | INFO | \u2705 Enhanced LightGBM pipeline trained for 217
+2025-08-26 12:40:55,075 | enhanced_train_models | INFO |    Test MAE: 19.264 (on 283 samples)
+2025-08-26 12:40:55,075 | enhanced_train_models | INFO |    Test R²: -0.707
+2025-08-26 12:40:55,075 | enhanced_train_models | INFO |    Test MAPE: 117.26%
+2025-08-26 12:40:55,075 | enhanced_train_models | INFO |    CV MAE: 21.055 (avg of 4 folds)
+2025-08-26 12:40:55,075 | enhanced_train_models | INFO |    CV R²: -1.559
+2025-08-26 12:40:55,076 | enhanced_train_models | INFO | \u2705 Successfully trained enhanced model for 217
+2025-08-26 12:40:55,076 | enhanced_train_models | INFO | Saving enhanced models and metadata
+2025-08-26 12:40:55,092 | enhanced_train_models | INFO |   \u2705 Saved model for 203: enhanced_model_203.pkl
+2025-08-26 12:40:55,110 | enhanced_train_models | INFO |   \u2705 Saved model for 206: enhanced_model_206.pkl
+2025-08-26 12:40:55,129 | enhanced_train_models | INFO |   \u2705 Saved model for 202: enhanced_model_202.pkl
+2025-08-26 12:40:55,147 | enhanced_train_models | INFO |   \u2705 Saved model for 211: enhanced_model_211.pkl
+2025-08-26 12:40:55,172 | enhanced_train_models | INFO |   \u2705 Saved model for 213: enhanced_model_213.pkl
+2025-08-26 12:40:55,192 | enhanced_train_models | INFO |   \u2705 Saved model for 209: enhanced_model_209.pkl
+2025-08-26 12:40:55,209 | enhanced_train_models | INFO |   \u2705 Saved model for 210: enhanced_model_210.pkl
+2025-08-26 12:40:55,226 | enhanced_train_models | INFO |   \u2705 Saved model for 215: enhanced_model_215.pkl
+2025-08-26 12:40:55,243 | enhanced_train_models | INFO |   \u2705 Saved model for 214: enhanced_model_214.pkl
+2025-08-26 12:40:55,265 | enhanced_train_models | INFO |   \u2705 Saved model for 217: enhanced_model_217.pkl
+2025-08-26 12:40:55,271 | enhanced_train_models | INFO | \u2705 Enhanced training data saved: C:/forlogssystems/Models\enhanced_training_data.pkl
+2025-08-26 12:40:55,271 | enhanced_train_models | INFO | \u2705 All enhanced models and metadata saved
+2025-08-26 12:40:55,291 | enhanced_train_models | INFO | 
+============================================================
+2025-08-26 12:40:55,291 | enhanced_train_models | INFO | \U0001f4ca MODEL PERFORMANCE SUMMARY
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO | ============================================================
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO | Work Type 203:
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   MAE: 6.223 | R²: 0.078 | MAPE: 18.73%
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   Records: 1239 train, 309 test
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO | Work Type 206:
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   MAE: 24.056 | R²: 0.826 | MAPE: 16.38%
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   Records: 1515 train, 378 test
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO | Work Type 202:
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   MAE: 4.992 | R²: 0.261 | MAPE: 24.16%
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   Records: 1236 train, 309 test
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO | Work Type 211:
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   MAE: 10.317 | R²: 0.657 | MAPE: 16.52%
+2025-08-26 12:40:55,292 | enhanced_train_models | INFO |   Records: 1297 train, 324 test
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO | Work Type 213:
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   MAE: 8.674 | R²: 0.471 | MAPE: 40.33%
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   Records: 1239 train, 309 test
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO | Work Type 209:
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   MAE: 10.379 | R²: 0.841 | MAPE: 14.62%
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   Records: 1240 train, 310 test
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO | Work Type 210:
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   MAE: 6.702 | R²: 0.889 | MAPE: 10.10%
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   Records: 1268 train, 317 test
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO | Work Type 215:
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   MAE: 5.852 | R²: 0.890 | MAPE: 12.20%
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   Records: 1369 train, 342 test
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO | Work Type 214:
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   MAE: 9.198 | R²: 0.744 | MAPE: 16.06%
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   Records: 1255 train, 313 test
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO | Work Type 217:
+2025-08-26 12:40:55,293 | enhanced_train_models | INFO |   MAE: 19.264 | R²: -0.707 | MAPE: 117.26%
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |   Records: 1136 train, 283 test
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | ============================================================
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | 
+\U0001f389 ENHANCED MODEL TRAINING COMPLETED SUCCESSFULLY
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | ============================================================
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | \u2705 Trained models: ['203', '206', '202', '211', '213', '209', '210', '215', '214', '217']
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | 
+\U0001f4c8 203 Performance Summary:
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test MAE: 6.223 (True out-of-sample)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test R²: 0.078
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test MAPE: 18.73%
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    CV MAE: 7.285 (Cross-validation average)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    CV R²: -0.162
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Features: 25 (including 8 trend features)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | 
+\U0001f4c8 206 Performance Summary:
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test MAE: 24.056 (True out-of-sample)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test R²: 0.826
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test MAPE: 16.38%
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    CV MAE: 25.776 (Cross-validation average)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    CV R²: 0.738
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Features: 30 (including 8 trend features)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | 
+\U0001f4c8 202 Performance Summary:
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test MAE: 4.992 (True out-of-sample)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test R²: 0.261
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test MAPE: 24.16%
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    CV MAE: 3.531 (Cross-validation average)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    CV R²: 0.241
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Features: 25 (including 6 trend features)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO | 
+\U0001f4c8 211 Performance Summary:
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test MAE: 10.317 (True out-of-sample)
+2025-08-26 12:40:55,294 | enhanced_train_models | INFO |    Test R²: 0.657
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAPE: 16.52%
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV MAE: 11.093 (Cross-validation average)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV R²: 0.686
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Features: 25 (including 6 trend features)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO | 
+\U0001f4c8 213 Performance Summary:
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAE: 8.674 (True out-of-sample)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test R²: 0.471
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAPE: 40.33%
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV MAE: 10.919 (Cross-validation average)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV R²: -0.037
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Features: 25 (including 6 trend features)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO | 
+\U0001f4c8 209 Performance Summary:
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAE: 10.379 (True out-of-sample)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test R²: 0.841
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAPE: 14.62%
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV MAE: 10.311 (Cross-validation average)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV R²: 0.798
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Features: 25 (including 8 trend features)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO | 
+\U0001f4c8 210 Performance Summary:
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAE: 6.702 (True out-of-sample)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test R²: 0.889
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAPE: 10.10%
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV MAE: 6.227 (Cross-validation average)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV R²: 0.883
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Features: 25 (including 9 trend features)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO | 
+\U0001f4c8 215 Performance Summary:
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAE: 5.852 (True out-of-sample)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test R²: 0.890
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Test MAPE: 12.20%
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV MAE: 5.307 (Cross-validation average)
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    CV R²: 0.912
+2025-08-26 12:40:55,295 | enhanced_train_models | INFO |    Features: 25 (including 9 trend features)
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO | 
+\U0001f4c8 214 Performance Summary:
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Test MAE: 9.198 (True out-of-sample)
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Test R²: 0.744
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Test MAPE: 16.06%
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    CV MAE: 5.020 (Cross-validation average)
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    CV R²: 0.801
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Features: 25 (including 5 trend features)
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO | 
+\U0001f4c8 217 Performance Summary:
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Test MAE: 19.264 (True out-of-sample)
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Test R²: -0.707
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Test MAPE: 117.26%
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    CV MAE: 21.055 (Cross-validation average)
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    CV R²: -1.559
+2025-08-26 12:40:55,296 | enhanced_train_models | INFO |    Features: 25 (including 5 trend features)
