@@ -20,12 +20,18 @@ DEFAULT_LAYOUT = "wide"  # or "centered"
 THEME_COLOR = "#1E88E5"  # Primary theme color
 
 
-# Paths
-BASE_DIR = Path(__file__).parent.absolute()
-LOGO_PATH = os.path.join(BASE_DIR, "assets", "2.png")
-MODELS_DIR = "C:/forlogssystems/Models"
-DATA_DIR = os.path.join(BASE_DIR, "data")
-LOGS_DIR = os.path.join(BASE_DIR, "logs")
+BASE_DIR = r"C:\forlagssystem"
+APP_DIR = os.path.join(BASE_DIR, "app")
+MODELS_DIR = os.path.join(BASE_DIR, "models")  # Use existing models directory
+DATA_DIR = os.path.join(BASE_DIR, "data")      # Use existing data directory
+
+# Log directory (keep in app for easier access)
+LOGS_DIR = os.path.join(APP_DIR, "logs")
+
+# Create directories if they don't exist
+os.makedirs(MODELS_DIR, exist_ok=True)
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 
 APP_ICON = os.path.join(BASE_DIR, "assets", "2.png")
