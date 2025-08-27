@@ -37,3 +37,8 @@ scipy>=1.11.0
 # Additional utilities found in your code
 requests>=2.31.0
 urllib3>=2.0.0
+
+# Add to existing requirements.txt
+ldap3>=2.9.1
+streamlit-authenticator>=0.2.3
+python-decouple>=3.8

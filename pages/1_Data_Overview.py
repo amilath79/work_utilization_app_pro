@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import traceback
 import pyodbc
 from utils.state_manager import StateManager
+from utils.page_auth import check_live_ad_page_access
 
 # Add parent directory to path to import from utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,7 +30,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
+check_live_ad_page_access()
 
 # Configure logger
 import logging

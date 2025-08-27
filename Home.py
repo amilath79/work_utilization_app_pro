@@ -17,7 +17,9 @@ from utils.data_loader import load_data, load_combined_models
 from utils.sql_data_connector import extract_sql_data
 from utils.feature_engineering import EnhancedFeatureTransformer
 from utils.state_manager import StateManager
-from config import DATA_DIR, MODELS_DIR, LOGO_PATH, APP_TITLE, SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, APP_ICON
+from config import DATA_DIR, MODELS_DIR, APP_TITLE, SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, APP_ICON
+
+from utils.page_auth import check_live_ad_page_access
 
 # Configure page - SINGLE CONFIG ONLY
 if ENTERPRISE_CONFIG.enterprise_mode:
@@ -34,6 +36,8 @@ else:
         layout="wide",
         initial_sidebar_state="expanded"
     )
+
+check_live_ad_page_access('Home.py')
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -93,9 +97,6 @@ def main():
         st.sidebar.markdown(f"🔒 Environment: {ENTERPRISE_CONFIG.environment.value}")
 
         
-    # Display logo if available
-    if os.path.exists(LOGO_PATH):
-        st.image(LOGO_PATH, width=50)
     
     st.title("Work Utilization Prediction")
     

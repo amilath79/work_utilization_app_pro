@@ -36,6 +36,88 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 
 APP_ICON = os.path.join(BASE_DIR, "assets", "2.png")
 
+
+# ==============================================
+# ACTIVE DIRECTORY CONFIGURATION  
+# ==============================================
+
+AD_ENABLED = os.getenv('AD_ENABLED', 'true').lower() == 'true'
+AD_SERVER = os.getenv('AD_SERVER', 'FSKHDC4.fsys.net')
+AD_PORT = int(os.getenv('AD_PORT', '389'))
+AD_USE_SSL = os.getenv('AD_USE_SSL', 'false').lower() == 'true'
+
+# Service Account (working format from your test)
+AD_SERVICE_USER = os.getenv('AD_SERVICE_USER', 'svc_workforce_app@fsys.net')
+AD_SERVICE_PASSWORD = os.getenv('AD_SERVICE_PASSWORD', 'fund-jRnyPVs23!')
+
+
+AD_SEARCH_BASES = [
+    'OU=Förlagssystem,DC=fsys,DC=net',  
+    'CN=Users,DC=fsys,DC=net',          # Standard user location
+    'DC=fsys,DC=net'                    # Domain root
+]
+
+# Live AD Groups (IT manages these)
+AD_GROUPS_TO_ROLES = {
+    'WPA_Admins': 'admin',      # Full application access
+    'WPA_Analysts': 'analyst',  # Predictions and analysis
+    'WPA_Users': 'user'         # View-only access
+}
+
+# Page Access Control now controlled by AD groups
+PAGE_ACCESS_CONFIG = {
+    'Home.py': ['user', 'analyst', 'admin'],
+    'pages/1_Data_Overview.py': ['user', 'analyst', 'admin'],
+    'pages/2_Predictions.py': ['analyst', 'admin'],
+    'pages/3_Backtesting.py': ['analyst', 'admin'],
+    'pages/3_Model_Analysis.py': ['analyst', 'admin'],
+    'pages/5_KPI_Management.py': ['admin'],
+    'pages/6_Demand_Management.py': ['admin'],
+    'pages/7_Next_Day_Prediction.py': ['analyst', 'admin'],
+    'pages/8_Actual_vs_Predicted.py': ['analyst', 'admin'],
+}
+
+# Caching settings for performance
+AD_CACHE_TTL_MINUTES = 5  # Cache group memberships for 5 minutes
+AD_MAX_CACHE_SIZE = 100   # Maximum cached user records
+
+# Fallback settings
+FALLBACK_AUTH_ENABLED = os.getenv('FALLBACK_AUTH_ENABLED', 'true').lower() == 'true'
+
+# # AD Connection Settings
+# AD_ENABLED = os.getenv('AD_ENABLED', 'true').lower() == 'true'
+# AD_DOMAIN = os.getenv('AD_DOMAIN', 'fsys') 
+# AD_SERVER = os.getenv('AD_SERVER', 'FSKHDC4.fsys.net')
+# AD_PORT = int(os.getenv('AD_PORT', '389'))
+# AD_USE_SSL = os.getenv('AD_USE_SSL', 'false').lower() == 'true'
+
+# AD_USER_FORMAT = 'fsys\\{username}'
+
+# AD_BASE_DN = os.getenv('AD_BASE_DN', 'fsys.net/Förlagssystem/Users')
+
+# # Service Account
+# AD_SERVICE_USER = os.getenv('AD_SERVICE_USER', 'svc_workforce_app')
+
+
+# # AD Group Mapping
+# AD_GROUPS = {
+#     'admin': 'WPA_Admins',
+#     'analyst': 'WPA_Analysts', 
+#     'user': 'WPA_Users'
+# }
+
+
+# ROLE_MAPPING = {
+#     'amila.g': 'admin',
+#     'amila': 'admin', 
+#     'mattias': 'analyst',
+#     'david': 'user'
+# }
+
+# # Fallback authentication
+# FALLBACK_AUTH_ENABLED = os.getenv('FALLBACK_AUTH_ENABLED', 'true').lower() == 'true'
+
+
 # Model and data configurations
 MODEL_CONFIGS = {
     'rf_models': 'work_utilization_models.pkl',
