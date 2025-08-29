@@ -17,7 +17,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.holiday_utils import get_swedish_holidays, is_non_working_day
 from config import MODELS_DIR, DATA_DIR
-
+from utils.page_auth import check_live_ad_page_access
 # Configure page
 st.set_page_config(
     page_title="Non-Working Days",
@@ -25,6 +25,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+check_live_ad_page_access()
 
 # Configure logger
 logger = logging.getLogger(__name__)

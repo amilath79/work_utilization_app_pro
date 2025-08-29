@@ -21,6 +21,7 @@ from utils.kpi_manager import load_punch_codes
 from utils.sql_data_connector import load_demand_forecast_data, SQLDataConnector
 from config import (DATA_DIR, SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, 
                    DATE_FORMAT, PUNCH_CODE_NAMES) 
+from utils.page_auth import check_live_ad_page_access
 
 # Configure page
 st.set_page_config(
@@ -29,6 +30,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+
+check_live_ad_page_access()
 
 def handle_data_edit(edited_df):
     """

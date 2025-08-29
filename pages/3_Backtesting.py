@@ -29,7 +29,7 @@ from utils.data_loader import load_combined_models, load_enhanced_models
 from utils.sql_data_connector import extract_sql_data
 from utils.holiday_utils import is_non_working_day, is_working_day_for_punch_code
 from config import MODELS_DIR, DATA_DIR, SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, ESSENTIAL_LAGS, ESSENTIAL_WINDOWS
-
+from utils.page_auth import check_live_ad_page_access   
 # Configure page
 st.set_page_config(
     page_title="Robust Model Backtesting",
@@ -37,6 +37,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+
+check_live_ad_page_access()
 
 # Configure logger
 logger = logging.getLogger(__name__)

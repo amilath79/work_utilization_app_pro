@@ -24,6 +24,7 @@ from utils.sql_data_connector import save_predictions_to_db
 from utils.holiday_utils import is_non_working_day
 from config import MODELS_DIR, ENHANCED_WORK_TYPES, PUNCH_CODE_NAMES
 from utils.display_utils import get_display_name
+from utils.page_auth import check_live_ad_page_access
 
 # Configure logging
 logging.basicConfig(
@@ -40,6 +41,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+check_live_ad_page_access()
 # Initialize all session state variables
 if 'df' not in st.session_state:
     st.session_state.df = None

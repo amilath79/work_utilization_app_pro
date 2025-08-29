@@ -22,6 +22,74 @@ from utils.sql_data_connector import extract_sql_data
 from utils.feature_engineering import EnhancedFeatureTransformer
 from config import DATA_DIR, SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION
 
+
+
+def ensure_data_loaded():
+    """Ensure data is loaded, load if not present"""
+    # Check if data is already loaded
+    if 'df' in st.session_state and st.session_state.df is not None:
+        return True
+    
+    # Try to load from database
+    with st.spinner("Loading data from database..."):
+        db_data = load_workutilizationdata()
+        
+        if db_data is not None:
+            st.session_state.df = db_data
+            st.success(f"✅ Data loaded from database with {len(db_data):,} records")
+            return True
+    
+    # If database fails, show upload options
+    st.warning("⚠️ Could not connect to database. Please upload data file.")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        uploaded_file = st.file_uploader(
+            "Upload Excel File", 
+            type=["xlsx", "xls"],
+            help="Upload your Work Utilization Excel file"
+        )
+        
+        if uploaded_file is not None:
+            try:
+                with st.spinner("Loading data from uploaded file..."):
+                    st.session_state.df = load_data(uploaded_file)
+                    st.success(f"✅ Data loaded successfully with {len(st.session_state.df):,} records")
+                    return True
+            except Exception as e:
+                st.error(f"❌ Error loading file: {str(e)}")
+                return False
+    
+    with col2:
+        use_sample_data = st.checkbox("Use Sample Data", value=False)
+        
+        if use_sample_data:
+            sample_path = os.path.join(DATA_DIR, "sample_work_utilization.xlsx")
+            
+            if os.path.exists(sample_path):
+                with st.spinner("Loading sample data..."):
+                    st.session_state.df = load_data(sample_path)
+                    st.success(f"✅ Sample data loaded with {len(st.session_state.df):,} records")
+                    return True
+            else:
+                st.warning("Sample data file not found.")
+    
+    return False
+
+# Update the main() function in Data Overview
+def main():
+    st.title("📊 Data Overview")
+    st.write("Explore and analyze your workforce utilization data.")
+    
+    # Ensure data is loaded FIRST
+    if not ensure_data_loaded():
+        st.info("Please load data to continue with analysis.")
+        return
+    
+    # Now proceed with existing data overview logic
+    # ... rest of existing code ...
+
 # Configure page
 st.set_page_config(
     page_title="Data Overview",

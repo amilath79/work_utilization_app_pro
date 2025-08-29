@@ -16,6 +16,7 @@ from utils.state_manager import StateManager
 from utils.kpi_manager import load_kpi_data, save_kpi_data, initialize_kpi_dataframe, save_financial_year
 from utils.display_utils import transform_punch_code_columns, get_streamlit_column_config  
 from config import PUNCH_CODE_NAMES
+from utils.page_auth import check_live_ad_page_access    
 
 # Configure page
 st.set_page_config(
@@ -25,6 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+check_live_ad_page_access()
 # Configure logger
 logger = logging.getLogger(__name__)
 

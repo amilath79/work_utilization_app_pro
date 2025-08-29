@@ -28,7 +28,7 @@ from utils.prediction import predict_next_day
 from config import SQL_SERVER, SQL_DATABASE, SQL_TRUSTED_CONNECTION, SQL_DATABASE_LIVE
 from utils.sql_data_connector import load_demand_with_kpi_data
 from utils.demand_scheduler import DemandScheduler, shift_demand_forward, get_next_working_day
-
+from utils.page_auth import check_live_ad_page_access   
 # Add these imports after existing imports around line 15-20
 from utils.display_utils import get_display_name, transform_punch_code_columns, get_streamlit_column_config
 # from config import UI_CONFIG, PUNCH_CODE_NAMES, PUNCH_CODE_WORKFORCE_LIMITS
@@ -41,6 +41,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+check_live_ad_page_access()
 # Configure logger
 logger = logging.getLogger(__name__)
 

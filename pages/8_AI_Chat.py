@@ -6,7 +6,7 @@ import requests
 import json
 from datetime import datetime
 import uuid
-
+from utils.page_auth import check_live_ad_page_access
 # Configure page
 st.set_page_config(
     page_title="AI Workforce Chat",
@@ -14,6 +14,8 @@ st.set_page_config(
     layout="wide"
 )
 
+
+check_live_ad_page_access()
 def send_chat_message(message, webhook_url, session_id=None):
     """Send message to AI chat webhook with session management"""
     try:

@@ -37,6 +37,21 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 APP_ICON = os.path.join(BASE_DIR, "assets", "2.png")
 
 
+
+# Brand Colors for Forlagssystem.se
+BRAND_COLORS = {
+    'primary_blue': '#0073AE',      # FS-Blue
+    'dark_blue': '#0F2436',         # Dark blue  
+    'light_green': '#A2BF00',       # Light Green
+    'pink': '#E780A3',              # Pink
+    'white': '#FFFFFF',
+    'black': '#000000',
+    'medium_blue': '#4A90E2'        # For body text alternative
+}
+
+# Update existing theme color
+THEME_COLOR = "#0073AE"  # Change from "#1E88E5" to FS-Blue
+
 # ==============================================
 # ACTIVE DIRECTORY CONFIGURATION  
 # ==============================================
@@ -468,7 +483,7 @@ logging.basicConfig(
 @dataclass
 class EnterpriseConfig:
     """Simple enterprise configuration"""
-    enterprise_mode: bool = os.getenv('ENTERPRISE_MODE', 'false').lower() == 'true'
+    enterprise_mode: bool = os.getenv('ENTERPRISE_MODE', 'true').lower() == 'true'
     
     class Environment:
         value: str = os.getenv('ENVIRONMENT', 'development')

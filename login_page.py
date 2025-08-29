@@ -6,19 +6,21 @@ from utils.ad_auth import LiveADAuthenticator
 from utils.session_manager import EnhancedSessionManager
 from config import AD_ENABLED, FALLBACK_AUTH_ENABLED
 import logging
+from utils.brand_styling import load_brand_css
 
 logger = logging.getLogger(__name__)
 
 def show_login_page():
-    """Display login form with live AD integration"""
-    st.title("🔐 Workforce Prediction - Live AD Login")
+    
+
+    st.markdown("<h1 style='text-align: center;'>🔐 Workforce Prediction Login</h1>", unsafe_allow_html=True)
+
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
         with st.form("login_form"):
-            st.markdown("### Enterprise Login")
-            st.markdown("*Your access is controlled by IT through Active Directory groups*")
+            st.markdown("### Login")
             
             username = st.text_input("Username", placeholder="Enter your AD username")
             password = st.text_input("Password", type="password", placeholder="Enter your AD password")
@@ -55,19 +57,16 @@ def authenticate_user(username, password):
             if success and user_info:
                 EnhancedSessionManager.login_user(user_info)
                 
-                # Show success message with group info
+                # Show success message
                 st.success(f"Welcome {user_info.get('display_name', username)}!")
                 
                 with st.expander("ℹ️ Your Access Details"):
                     st.write(f"**Role:** {user_info.get('role', 'user').title()}")
                     st.write(f"**AD Groups:** {', '.join(user_info.get('ad_groups', []))}")
                     st.write(f"**Email:** {user_info.get('email', 'N/A')}")
-                    st.write(f"**Last Updated:** {user_info.get('last_updated', 'N/A')}")
                 
-                # Auto-refresh after 2 seconds
-                time.sleep(2)
+                st.markdown("*Redirecting to application...*")
                 st.rerun()
-                
             else:
                 # Try fallback if enabled
                 if FALLBACK_AUTH_ENABLED and fallback_authenticate(username, password):

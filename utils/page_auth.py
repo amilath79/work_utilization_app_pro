@@ -7,68 +7,105 @@ from utils.session_manager import EnhancedSessionManager
 from login_page import show_login_page
 from config import PAGE_ACCESS_CONFIG
 
-def check_live_ad_page_access(page_name=None):
-    """
-    Live AD group-based authentication and authorization check
-    Groups are checked in real-time from AD
-    """
+# def check_live_ad_page_access(page_name=None):
+#     """
+#     Live AD group-based authentication and authorization check
+#     Groups are checked in real-time from AD
+#     """
     
-    # Step 1: Check authentication
-    if EnhancedSessionManager.check_session_timeout():
-        st.rerun()
+#     # Step 1: Check authentication
+#     if EnhancedSessionManager.check_session_timeout():
+#         st.rerun()
         
-    if not EnhancedSessionManager.is_authenticated():
-        show_login_page()
-        st.stop()
+#     if not EnhancedSessionManager.is_authenticated():
+#         show_login_page()
+#         st.stop()
     
-    # Step 2: Get current page
-    if page_name is None:
-        page_name = get_current_page_name()
+#     # Step 2: Get current page
+#     if page_name is None:
+#         page_name = get_current_page_name()
     
-    # Step 3: Get fresh user info (with live group check)
-    user_info = EnhancedSessionManager.get_user_info()
-    user_role = user_info.get('role', 'user')
+#     # Step 3: Get fresh user info (with live group check)
+#     user_info = EnhancedSessionManager.get_user_info()
+#     user_role = user_info.get('role', 'user')
     
-    # Step 4: Check page access
-    allowed_roles = PAGE_ACCESS_CONFIG.get(page_name, ['admin'])
+#     # Step 4: Check page access
+#     allowed_roles = PAGE_ACCESS_CONFIG.get(page_name, ['admin'])
     
-    if not EnhancedSessionManager.has_role('user'):  # Basic auth check
-        show_login_page()
-        st.stop()
+#     if not EnhancedSessionManager.has_role('user'):  # Basic auth check
+#         show_login_page()
+#         st.stop()
     
-    # Check specific role requirement
-    page_requires = min(['user', 'analyst', 'admin'].index(role) for role in allowed_roles)
-    user_level = ['user', 'analyst', 'admin'].index(user_role) if user_role in ['user', 'analyst', 'admin'] else 0
+#     # Check specific role requirement
+#     page_requires = min(['user', 'analyst', 'admin'].index(role) for role in allowed_roles)
+#     user_level = ['user', 'analyst', 'admin'].index(user_role) if user_role in ['user', 'analyst', 'admin'] else 0
     
-    if user_level < page_requires:
-        # Access denied
-        st.error("🚫 Access Denied - Insufficient Permissions")
+#     if user_level < page_requires:
+#         # Access denied
+#         st.error("🚫 Access Denied - Insufficient Permissions")
         
-        required_roles_text = " or ".join([role.title() for role in allowed_roles])
+#         required_roles_text = " or ".join([role.title() for role in allowed_roles])
         
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            st.info(f"**Your Access:** {user_info.get('display_name')} ({user_role.title()})")
-            st.info(f"**Required:** {required_roles_text}")
-            st.info(f"**AD Groups:** {', '.join(user_info.get('ad_groups', ['None']))}")
+#         col1, col2 = st.columns([2, 1])
+#         with col1:
+#             st.info(f"**Your Access:** {user_info.get('display_name')} ({user_role.title()})")
+#             st.info(f"**Required:** {required_roles_text}")
+#             st.info(f"**AD Groups:** {', '.join(user_info.get('ad_groups', ['None']))}")
         
-        with col2:
-            st.markdown("### Actions")
-            if st.button("🔄 Refresh Groups", help="Check for updated AD group memberships"):
-                EnhancedSessionManager.force_group_refresh()
-                st.rerun()
+#         with col2:
+#             st.markdown("### Actions")
+#             if st.button("🔄 Refresh Groups", help="Check for updated AD group memberships"):
+#                 EnhancedSessionManager.force_group_refresh()
+#                 st.rerun()
             
-            if st.button("🚪 Logout", help="Login with different account"):
-                EnhancedSessionManager.logout_user()
-                st.rerun()
+#             if st.button("🚪 Logout", help="Login with different account"):
+#                 EnhancedSessionManager.logout_user()
+#                 st.rerun()
         
-        st.markdown("---")
-        st.markdown("💡 **Need Access?** Contact your IT administrator to be added to the appropriate AD groups.")
+#         st.markdown("---")
+#         st.markdown("💡 **Need Access?** Contact your IT administrator to be added to the appropriate AD groups.")
+        
+#         st.stop()
+    
+#     # Step 5: Access granted - show user info
+#     display_user_sidebar(user_info)
+
+
+def check_live_ad_page_access(page_name=None):
+    """Debug version with error handling"""
+    try:
+        print("🔍 Starting page access check...")
+        
+        
+        # Step 1: Check authentication
+        # if EnhancedSessionManager.check_session_timeout():
+        #     print("Session timeout detected")
+        #     st.rerun()
+            
+        if not EnhancedSessionManager.is_authenticated():
+            print("User not authenticated, showing login page")
+            show_login_page()
+            st.stop()
+        
+        print("✅ Authentication check passed")
+        
+        # If we get here, user is authenticated
+        user_info = EnhancedSessionManager.get_user_info()
+        print(f"User info: {user_info}")
+        
+        display_user_sidebar(user_info)
+        
+    except Exception as e:
+        st.error(f"Authentication Error: {str(e)}")
+        st.error(f"Error details: {type(e).__name__}")
+        
+        # Show login as fallback
+        try:
+            show_login_page()
+        except Exception as login_error:
+            st.error(f"Login page error: {str(login_error)}")
         
         st.stop()
-    
-    # Step 5: Access granted - show user info
-    display_user_sidebar(user_info)
 
 def display_user_sidebar(user_info):
     """Display user information in sidebar"""

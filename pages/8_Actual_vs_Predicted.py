@@ -4,8 +4,11 @@ from utils.sql_data_connector import load_utilization_vs_prediction
 from utils.metrics import mean_absolute_error, root_mean_squared_error, mean_absolute_percentage_error
 from utils.display_utils import get_display_name 
 from config import PUNCH_CODE_NAMES 
-
+from utils.page_auth import check_live_ad_page_access   
 st.set_page_config(page_title="Prediction vs Actuals", layout="wide")
+
+
+check_live_ad_page_access()
 
 st.title("🔍 Actual vs Predicted Performance")
 st.markdown("Compare actual utilization data with model predictions to evaluate performance.")

@@ -53,6 +53,10 @@ class EnhancedSessionManager:
         st.session_state.user_info = user_info
         st.session_state.login_time = datetime.now()
         st.session_state.last_group_check = datetime.now()
+    
+        # Debug: verify session is set
+        print(f"✅ Session set: {st.session_state.authenticated}")
+        print(f"✅ User info stored: {user_info.get('username')}")
         
     @staticmethod
     def logout_user():
@@ -79,11 +83,14 @@ class EnhancedSessionManager:
             return True
             
         login_time = st.session_state.get('login_time')
-        if login_time and datetime.now() - login_time > timedelta(hours=timeout_hours):
-            EnhancedSessionManager.logout_user()
-            return True
-            
-        return False
+        if login_time:
+            if datetime.now() - login_time > timedelta(hours=timeout_hours):
+                EnhancedSessionManager.logout_user()
+                return True
+            else:
+                return False  # Session is valid
+        else:
+            return True  # No login time means not logged in
     
     @staticmethod
     def has_role(required_role):
