@@ -132,6 +132,26 @@ def display_user_sidebar(user_info):
                 EnhancedSessionManager.logout_user()
                 st.rerun()
 
+
+        with st.sidebar:
+            st.markdown("---")
+            st.markdown("### 👤 User Information")
+            st.markdown(f"**Name:** {user_info.get('display_name', 'Unknown')}")
+            st.markdown(f"**Role:** {user_info.get('role', 'user').title()}")
+            
+            # DEBUG: Show actual AD groups found
+            st.markdown("### 🔍 DEBUG INFO")
+            st.write("**All AD Groups:**")
+            for group in user_info.get('groups', []):
+                st.write(f"- {group}")
+            
+            st.write("**Matched App Groups:**")
+            for group in user_info.get('ad_groups', []):
+                st.write(f"- {group}")
+            
+            st.write("**Role Determination:**")
+            st.write(f"Final Role: {user_info.get('role')}")
+
 def get_current_page_name():
     """Get current page name"""
     try:
