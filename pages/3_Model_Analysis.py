@@ -27,7 +27,7 @@ st.set_page_config(
 )
 
 
-check_live_ad_page_access()
+check_live_ad_page_access('pages/3_Model_Analysis.py')
 
 # Configure logger
 logger = logging.getLogger(__name__)

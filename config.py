@@ -82,7 +82,7 @@ AD_GROUPS_TO_ROLES = {
 # Page Access Control now controlled by AD groups
 PAGE_ACCESS_CONFIG = {
     'Home.py': ['user', 'analyst', 'admin'],
-    'pages/1_Data_Overview.py': ['user', 'analyst', 'admin'],
+    'pages/1_Data_Overview.py': ['user', 'analyst'],
     'pages/2_Predictions.py': ['analyst', 'admin'],
     'pages/3_Backtesting.py': ['analyst', 'admin'],
     'pages/3_Model_Analysis.py': ['analyst', 'admin'],

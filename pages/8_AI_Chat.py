@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 
-check_live_ad_page_access()
+check_live_ad_page_access('')
 def send_chat_message(message, webhook_url, session_id=None):
     """Send message to AI chat webhook with session management"""
     try:

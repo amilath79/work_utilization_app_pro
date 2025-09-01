@@ -32,7 +32,7 @@ st.set_page_config(
 )
 
 
-check_live_ad_page_access()
+check_live_ad_page_access('pages/6_Demand_Management.py')
 
 def handle_data_edit(edited_df):
     """

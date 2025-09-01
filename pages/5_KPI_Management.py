@@ -26,7 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-check_live_ad_page_access()
+check_live_ad_page_access('pages/5_KPI_Management.py')
 # Configure logger
 logger = logging.getLogger(__name__)
 

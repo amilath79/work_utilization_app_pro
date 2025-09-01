@@ -41,7 +41,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-check_live_ad_page_access()
+check_live_ad_page_access('pages/7_Next_Day_Prediction.py')
 # Configure logger
 logger = logging.getLogger(__name__)
 

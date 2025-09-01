@@ -41,7 +41,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-check_live_ad_page_access()
+check_live_ad_page_access('pages/2_Predictions.py')
 # Initialize all session state variables
 if 'df' not in st.session_state:
     st.session_state.df = None

@@ -98,7 +98,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-check_live_ad_page_access()
+check_live_ad_page_access('pages/1_Data_Overview.py')
 
 # Configure logger
 import logging

@@ -8,7 +8,7 @@ from utils.page_auth import check_live_ad_page_access
 st.set_page_config(page_title="Prediction vs Actuals", layout="wide")
 
 
-check_live_ad_page_access()
+check_live_ad_page_access('pages/8_Actual_vs_Predicted.py')
 
 st.title("🔍 Actual vs Predicted Performance")
 st.markdown("Compare actual utilization data with model predictions to evaluate performance.")
