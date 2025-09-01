@@ -72,16 +72,11 @@ from config import PAGE_ACCESS_CONFIG
 
 
 def check_live_ad_page_access(page_name=None):
-    """Debug version with error handling"""
+    """Complete version with role-based access control"""
     try:
         print("🔍 Starting page access check...")
         
-        
         # Step 1: Check authentication
-        # if EnhancedSessionManager.check_session_timeout():
-        #     print("Session timeout detected")
-        #     st.rerun()
-            
         if not EnhancedSessionManager.is_authenticated():
             print("User not authenticated, showing login page")
             show_login_page()
@@ -89,24 +84,73 @@ def check_live_ad_page_access(page_name=None):
         
         print("✅ Authentication check passed")
         
-        # If we get here, user is authenticated
-        user_info = EnhancedSessionManager.get_user_info()
-        print(f"User info: {user_info}")
+        # Step 2: Get current page name if not provided
+        if page_name is None:
+            page_name = get_current_page_name()
         
+        # Step 3: Get user info
+        user_info = EnhancedSessionManager.get_user_info()
+        user_role = user_info.get('role', 'user')
+        
+        # Step 4: Check page access permissions
+        allowed_roles = PAGE_ACCESS_CONFIG.get(page_name, ['admin'])  # Default: admin only
+        
+        # DEBUG: Print what's happening
+        print(f"🔍 PAGE ACCESS DEBUG:")
+        print(f"   Page: {page_name}")
+        print(f"   User Role: {user_role}")
+        print(f"   Allowed Roles: {allowed_roles}")
+        print(f"   User in allowed roles: {user_role in allowed_roles}")
+        
+        # Step 5: Check if user has required role
+        if user_role not in allowed_roles:
+            print(f"   ❌ ACCESS DENIED for {user_role}")
+            
+            # Show access denied message
+            st.error("🚫 Access Denied - Insufficient Permissions")
+            
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                st.info(f"**Your Access:** {user_info.get('display_name')} ({user_role.title()})")
+                required_roles_text = " or ".join([role.title() for role in allowed_roles])
+                st.info(f"**Required:** {required_roles_text}")
+                st.info(f"**AD Groups:** {', '.join(user_info.get('ad_groups', ['None']))}")
+            
+            with col2:
+                st.markdown("### Actions")
+                if st.button("🔄 Refresh Groups", help="Check for updated AD group memberships"):
+                    EnhancedSessionManager.force_group_refresh()
+                    st.rerun()
+                
+                if st.button("🚪 Logout", help="Login with different account"):
+                    EnhancedSessionManager.logout_user()
+                    st.rerun()
+            
+            st.markdown("---")
+            st.markdown("💡 **Need Access?** Contact your IT administrator to be added to the appropriate AD groups.")
+            
+            st.stop()
+        else:
+            print(f"   ✅ ACCESS GRANTED for {user_role}")
+        
+        # Step 6: Access granted - show user info
         display_user_sidebar(user_info)
         
     except Exception as e:
         st.error(f"Authentication Error: {str(e)}")
         st.error(f"Error details: {type(e).__name__}")
-        
-        # Show login as fallback
-        try:
-            show_login_page()
-        except Exception as login_error:
-            st.error(f"Login page error: {str(login_error)}")
-        
+        show_login_page()
         st.stop()
 
+def get_current_page_name():
+    """Get current page name"""
+    try:
+        import inspect
+        current_file = inspect.getfile(inspect.currentframe().f_back)
+        return os.path.basename(current_file)
+    except:
+        return "unknown_page"
+    
 def display_user_sidebar(user_info):
     """Display user information in sidebar"""
     with st.sidebar:
